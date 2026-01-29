@@ -1,0 +1,238 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    /* Scoped or Specific Styles for Profile */
+    .profile-body-bg {
+        background-color: #f8f9fa;
+    }
+
+    .profile-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 50px auto;
+        gap: 30px;
+    }
+
+    .sidebar {
+        width: 300px;
+        background: #c9b8a3;
+        color: white;
+        border-radius: 12px;
+        padding: 0;
+        height: fit-content;
+    }
+
+    .sidebar-header {
+        padding: 30px 20px;
+        text-align: center;
+        border-bottom: 1px solid #444;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #4b2e1e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin: 0 auto 15px;
+    }
+
+    .user-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .user-email {
+        font-size: 14px;
+        color: #aaa;
+    }
+
+    .sidebar-section {
+        padding: 20px 0;
+        border-bottom: 1px solid #444;
+    }
+
+    .sidebar-section-title {
+        font-size: 12px;
+        color: #888;
+        text-transform: uppercase;
+        padding: 0 20px 10px;
+        letter-spacing: 1px;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        margin: 0;
+    }
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #ddd;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .sidebar-menu a:hover {
+        background: #3a3a3a;
+        color: white;
+    }
+
+    .sidebar-menu a.active {
+        background: #4b2e1e;
+        color: white;
+    }
+
+    .sidebar-menu i {
+        width: 20px;
+        margin-right: 12px;
+    }
+
+    .sidebar-menu .badge {
+        margin-left: auto;
+        background: #4b2e1e;
+        font-size: 11px;
+    }
+
+    .logout-btn {
+        color: #ff6b6b !important;
+    }
+
+    .logout-btn:hover {
+        background: #3a3a3a !important;
+    }
+
+    .main-content {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #4b2e1e;
+        margin-bottom: 30px;
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: #4b2e1e;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="user-email">{{ user.email }}</div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">How you use FurniQ</div>
+            <ul class="sidebar-menu">
+                {% if user.is_staff %}
+                <li><a href="{% url 'staff_dashboard' %}" style="color: #d4a017;"><i class="fas fa-tachometer-alt"></i>
+                        Dashboard</a></li>
+                {% endif %}
+                <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> My Cart</a></li>
+                <li><a href="{% url 'order_history' %}" class="active"><i class="fas fa-receipt"></i> Orders and
+                        payments</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Account Settings</div>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'account_settings' %}"><i class="fas fa-lock"></i> Account privacy</a></li>
+                <li><a href="{% url 'saved_addresses' %}"><i class="fas fa-map-marker-alt"></i> Stored Addresses</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Support & Info</div>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section" style="border-bottom: none;">
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'logout' %}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-title">My Profile</h1>
+
+        <div class="info-card">
+            <div class="info-label">Full Name</div>
+            <div class="info-value">{{ user.get_full_name|default:"Not set" }}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-label">Email Address</div>
+            <div class="info-value">{{ user.email }}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-label">Username</div>
+            <div class="info-value">{{ user.username }}</div>
+        </div>
+
+        {% if profile.phone_number %}
+        <div class="info-card">
+            <div class="info-label">Phone Number</div>
+            <div class="info-value">{{ profile.phone_number }}</div>
+        </div>
+        {% endif %}
+
+        <div class="info-card">
+            <div class="info-label">Member Since</div>
+            <div class="info-value">{{ user.date_joined|date:"F Y" }}</div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'order_history' %}" class="btn"
+                style="background-color:#4b2e1e; color:white; padding:10px 30px; border-radius:6px; text-decoration:none;">View
+                My Orders</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

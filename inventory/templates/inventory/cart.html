@@ -1,0 +1,236 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .btn-remove-custom:hover {
+        background-color: #7c5a43 !important;
+        color: white !important;
+    }
+
+    .payment-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+    }
+
+    .payment-modal-dialog {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        max-width: 500px;
+        width: 100%;
+        position: relative;
+    }
+
+    .pm-close {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        border: none;
+        background: #eee;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .pm-option {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .pm-option:hover {
+        background: #f9f9f9;
+    }
+
+    .pm-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 15px;
+    }
+
+    .pm-icon.red { background: #e63946; }
+    .pm-icon.green { background: #28a745; }
+    .hidden { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section Start -->
+<section class="container-fluid py-5 bg-white text-center">
+    <h1 class="display-5 fw-normal" style="letter-spacing:0.2em; font-family: 'Italiana', serif;">CART</h1>
+    <hr class="mt-4" style="border-top:2px solid #333;">
+</section>
+<!-- Hero Section End -->
+
+<div class="container py-5" style="min-height: 60vh;">
+    <div id="cart-content" class="text-center w-100" style="font-family: 'Italiana', serif;">
+        <p class="mt-5" style="font-size: 1.3rem;">Your cart is empty.</p>
+    </div>
+</div>
+
+<div id="payment-modal" class="payment-modal" style="display:none;">
+    <div class="payment-modal-dialog">
+        <button class="pm-close" title="Close">×</button>
+
+        <div class="pm-panel pm-list">
+            <h4 style="font-family:'Italiana',serif;">Select Payment Method</h4>
+            <div class="pm-note" style="background:#fff3cd; padding:10px; border-radius:6px; margin:10px 0;">Test Mode Active — No real money will be charged.</div>
+            <p>Total Amount: <strong>Rs. <span class="pm-total">0</span></strong></p>
+
+            <div class="pm-option">
+                <div class="pm-left"><div class="pm-icon red">K</div></div>
+                <div class="pm-mid">
+                    <div style="font-weight:600">Khalti by IME</div>
+                    <div class="text-muted">Digital Wallet</div>
+                </div>
+                <div class="pm-right"><button class="btn btn-link pm-go" data-provider="khalti">Select →</button></div>
+            </div>
+
+            <div class="pm-option">
+                <div class="pm-left"><div class="pm-icon green">e</div></div>
+                <div class="pm-mid">
+                    <div style="font-weight:600">eSewa</div>
+                    <div class="text-muted">Digital Payment</div>
+                </div>
+                <div class="pm-right"><button class="btn btn-link pm-go" data-provider="esewa">Select →</button></div>
+            </div>
+        </div>
+
+        <div class="pm-panel pm-khalti hidden">
+            <button class="btn btn-link pm-back">← Back</button>
+            <h5>Khalti by IME</h5>
+            <div class="pm-amount-box" style="margin:10px 0;">
+                <div style="font-size:14px;color:#666">Total Amount</div>
+                <div style="font-size:20px;color:#e63946;">Rs. <span class="pm-total">0</span></div>
+            </div>
+            <p>You will be redirected to Khalti to complete your payment.</p>
+            <button class="btn w-100 pm-pay" data-provider="khalti" style="background:#e63946;color:#fff;border-color:#e63946;">Proceed to Pay via Khalti (Rs. <span class="pm-total">0</span>)</button>
+        </div>
+
+        <div class="pm-panel pm-esewa hidden">
+            <button class="btn btn-link pm-back">← Back</button>
+            <h5>eSewa Payment</h5>
+            <div class="pm-amount-box" style="margin:10px 0;">
+                <div style="font-size:14px;color:#666">Total Amount</div>
+                <div style="font-size:20px;color:#28a745;">Rs. <span class="pm-total">0</span></div>
+            </div>
+            <p>You will be redirected to eSewa to complete your payment.</p>
+            <button class="btn w-100 pm-pay" data-provider="esewa" style="background:#28a745;color:#fff;border-color:#28a745;">Proceed to Pay via eSewa (Rs. <span class="pm-total">0</span>)</button>
+        </div>
+
+        <div class="pm-panel pm-success hidden" style="text-align:center;">
+            <div style="font-size:48px;color:#28a745;">✔</div>
+            <h4>Order Placed!</h4>
+            <div class="card p-3 my-3 text-start">
+                <div><strong>Order #:</strong> <span id="order-number">-</span></div>
+                <div><strong>Paid:</strong> Rs. <span id="order-amount">0</span></div>
+            </div>
+            <button id="continue-shopping" class="btn btn-dark w-100">Continue Shopping</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PRODUCT_PRICES = {
+        "Floralshell Chair": 9000,
+        "Fuzzy sofa": 10000,
+        "Coffee Table Marble": 90000,
+        "Flower ArmChair": 9000,
+        "Ottoman": 8500,
+        "Lorenz Sofa": 80000,
+        "Bedside Table Wooden": 12000,
+        "Bouclé Bed": 150000,
+        "Arch headframe bed": 140000,
+        "Bubble bed": 100000,
+        "Odile Bedside Table": 9000,
+        "Channel Puffy Bed": 90000,
+        "Dining Table set": 100000,
+        "Scandinavian Dining Table Set": 60000,
+        "Oval Ceramic Dining Table": 150000,
+        "POVISON Modern Dining Table": 140000,
+        "Round Marble Dining Set": 100000,
+        "Curved wooden with Cushion dining": 80000
+    };
+
+    function renderCart() {
+        const savedData = localStorage.getItem('cart');
+        const cart = savedData ? JSON.parse(savedData) : {};
+        const cartContent = document.getElementById('cart-content');
+
+        if (!cart || Object.keys(cart).length === 0) {
+            cartContent.innerHTML = '<p class="mt-5" style="font-size: 1.3rem;">Your cart is empty.</p>';
+            return;
+        }
+
+        let totalAmount = 0;
+        let html = `<div class="container" style="max-width:700px; font-family: Italiana, serif;">`;
+        html += `<table class="table text-start shadow-sm">`;
+        html += `<thead class="table-light"><tr><th>Product</th><th>Quantity</th><th colspan = 2>Action</th></tr></thead><tbody>`;
+
+        Object.entries(cart).forEach(([name, qty]) => {
+            const price = PRODUCT_PRICES[name] || 0;
+            const subtotal = price * qty;
+            totalAmount += subtotal;
+
+            html += `<tr>
+                <td class="align-middle">${name}</td>
+                <td class="align-middle">Rs.${price}</td> 
+                <td class="align-middle">${qty}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-remove-custom" style="background-color: #7c5a43; color: white; border: none; padding: 5px 15px;" onclick="removeFromCart('${name}')">Remove</button>
+                </td>
+            </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        html += `<div class="text-end mt-2"><strong>Cart Total: Rs ${totalAmount.toLocaleString()}</strong></div>`;
+        html += `<div class="mt-4 text-center"><a href="/checkout/" class="btn btn-dark w-100" style="padding: 15px; font-size: 1.1rem; background-color: #7c5a43; border: none;">Proceed to Checkout</a></div></div>`;
+
+        cartContent.innerHTML = html;
+    }
+
+    function removeFromCart(name) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        delete cart[name];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    // Modal and Payment Logic remains same...
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('pm-close') || e.target.id === 'continue-shopping') {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+        if (e.target.classList.contains('pm-go')) { showPanel(e.target.dataset.provider); }
+        if (e.target.classList.contains('pm-back')) { showPanel('list'); }
+        if (e.target.classList.contains('pm-pay')) {
+            // Add payment execution logic here if needed
+            alert("Payment logic would trigger here.");
+        }
+    });
+
+    function showPanel(name) {
+        document.querySelectorAll('.pm-panel').forEach(p => p.classList.add('hidden'));
+        document.querySelector('.pm-' + name).classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+</script>
+{% endblock %}

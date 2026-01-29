@@ -1,0 +1,244 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .dashboard-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 50px auto;
+        gap: 30px;
+    }
+
+    .sidebar {
+        width: 300px;
+        background: #c9b8a3;
+        color: white;
+        border-radius: 12px;
+        padding: 0;
+        height: fit-content;
+    }
+
+    .sidebar-header {
+        padding: 30px 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #4b2e1e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin: 0 auto 15px;
+    }
+
+    .user-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s;
+        opacity: 0.8;
+    }
+
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+        background: rgba(0,0,0,0.1);
+        opacity: 1;
+    }
+
+    .sidebar-menu i {
+        width: 20px;
+        margin-right: 12px;
+    }
+
+    .main-content {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-family: 'Italiana', serif;
+        font-size: 28px;
+        color: #4b2e1e;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #c9b8a3;
+        padding-bottom: 10px;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table-custom th {
+        background: #4b2e1e;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-family: 'Italiana', serif;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .table-custom td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .table-custom tr:hover {
+        background: #fdfaf7;
+    }
+
+    .stock-control {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn-stock {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #4b2e1e;
+        background: transparent;
+        color: #4b2e1e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-stock:hover {
+        background: #4b2e1e;
+        color: white;
+    }
+
+    .stock-count {
+        font-weight: bold;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .badge-unassigned {
+        color: #999;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar text-white">
+                <i class="fas fa-id-card-alt"></i>
+            </div>
+            <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="user-role text-white opacity-75">Staff Member</div>
+        </div>
+
+        <div class="sidebar-section py-3">
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'staff_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{% url 'product_list' %}" class="active"><i class="fas fa-box-open"></i> Assigned Inventory</a></li>
+                <li><a href="{% url 'staff_orders' %}"><i class="fas fa-clipboard-list"></i> Assigned Orders</a></li>
+                <li><a href="{% url 'user' %}"><i class="fas fa-user-circle"></i> My Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="section-title mb-0">Assigned Inventory</h1>
+            <div class="search-box">
+                <form action="{% url 'product_list' %}" method="GET" class="d-flex">
+                    <input type="text" name="q" class="form-control me-2" placeholder="Search products..." value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-outline-dark">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-muted">Manage stock levels for products assigned to you.</p>
+
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th class="text-center">Stock Level</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ product.name }}</div>
+                        <div class="small text-muted">{{ product.category }}</div>
+                    </td>
+                    <td>Rs {{ product.price }}</td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="stock-control">
+                                <form action="{% url 'update_stock' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="decrease">
+                                    <button type="submit" class="btn-stock"><i class="fas fa-minus"></i></button>
+                                </form>
+                                <span class="stock-count {% if product.stock <= 5 %}text-danger{% endif %}">
+                                    {{ product.stock }}
+                                </span>
+                                <form action="{% url 'update_stock' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="increase">
+                                    <button type="submit" class="btn-stock"><i class="fas fa-plus"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin:inventory_product_change' product.id %}" class="btn btn-sm btn-link text-decoration-none text-dark">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5">
+                        <i class="fas fa-box-open mb-3 d-block text-muted" style="font-size: 3rem;"></i>
+                        No products found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

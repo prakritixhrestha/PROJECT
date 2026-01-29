@@ -1,0 +1,144 @@
+.\venv\Scripts\python.exe 
+: Traceback (most recent 
+call last):
+At line:1 char:1
++ 
+.\venv\Scripts\python.exe 
+manage.py check 2>&1 | 
+Out-File -FilePath " ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Tra  
+  ceback (most recent ca   
+ ll last)::String) [],     
+RemoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\manage.py",
+ line 22, in <module>
+    main()
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\manage.py",
+ line 18, in main
+    execute_from_command_li
+ne(sys.argv)
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\core\man
+agement\__init__.py", line 
+443, in 
+execute_from_command_line
+    utility.execute()
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\core\man
+agement\__init__.py", line 
+417, in execute
+    django.setup()
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\__init__
+.py", line 24, in setup
+    apps.populate(settings.
+INSTALLED_APPS)
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\apps\reg
+istry.py", line 124, in 
+populate
+    app_config.ready()
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\contrib\
+admin\apps.py", line 27, 
+in ready
+    
+self.module.autodiscover()
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\contrib\
+admin\__init__.py", line 
+52, in autodiscover
+    autodiscover_modules("a
+dmin", register_to=site)
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\utils\mo
+dule_loading.py", line 58, 
+in autodiscover_modules
+    import_module("%s.%s" 
+% (app_config.name, 
+module_to_search))
+  File "C:\Users\prakr\AppD
+ata\Local\Programs\Python\P
+ython312\Lib\importlib\__in
+it__.py", line 90, in 
+import_module
+    return _bootstrap._gcd_
+import(name[level:], 
+package, level)
+           ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
+  File "<frozen 
+importlib._bootstrap>", 
+line 1387, in _gcd_import
+  File "<frozen 
+importlib._bootstrap>", 
+line 1360, in 
+_find_and_load
+  File "<frozen 
+importlib._bootstrap>", 
+line 1331, in 
+_find_and_load_unlocked
+  File "<frozen 
+importlib._bootstrap>", 
+line 935, in _load_unlocked
+  File "<frozen importlib._
+bootstrap_external>", line 
+999, in exec_module
+  File "<frozen 
+importlib._bootstrap>", 
+line 488, in 
+_call_with_frames_removed
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\inventory\a
+dmin.py", line 7, in 
+<module>
+    admin.site.site_header 
+= format_html('<img src="/s
+tatic/images/FurniQ.png" 
+style="height: 30px; 
+vertical-align: middle; 
+margin-right: 10px;" /> 
+FURNIQ')
+                           
+  ^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\prakr\OneD
+rive\Desktop\SUMMER PROJECT
+\FurniQ\backend\venv\Lib\si
+te-packages\django\utils\ht
+ml.py", line 137, in 
+format_html
+    raise TypeError("args 
+or kwargs must be 
+provided.")
+TypeError: args or kwargs 
+must be provided.

@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block content_title %}{% endblock %}
+
+{% block metrics %}
+    {% if metrics %}
+    <div class="metrics-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        {% for metric in metrics %}
+        <div class="metric-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: var(--card-shadow); border-left: 4px solid var(--primary-blue);">
+            <h3 style="margin: 0; font-size: 11px; text-transform: uppercase; color: var(--text-muted);">{{ metric.label }}</h3>
+            <div class="value" style="font-size: 24px; font-weight: 700; margin-top: 10px;">{{ metric.value }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="card-container" style="background: white; border-radius: 12px; box-shadow: var(--card-shadow); overflow: hidden; border: 1px solid var(--border-color);">
+        <div style="padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 700;">{{ cl.opts.verbose_name_plural|capfirst }}</h2>
+            {% block object-tools %}
+                {% if has_add_permission %}
+                    <a href="{% url cl.opts|admin_urlname:'add' %}" class="btn-unified btn-primary" style="font-size: 12px; padding: 8px 16px; background: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none;">+ Add {{ cl.opts.verbose_name }}</a>
+                {% endif %}
+            {% endblock %}
+        </div>
+
+        <div style="padding: 15px 20px; background: #fafafa; border-bottom: 1px solid var(--border-color);">
+            {% if cl.search_fields %}
+                {% block search %}{% search_form cl %}{% endblock %}
+            {% endif %}
+        </div>
+
+        <form id="changelist-form" method="post" novalidate>{% csrf_token %}
+            <div class="results">
+                {% result_list cl %}
+            </div>
+            {% block pagination %}{% pagination cl %}{% endblock %}
+        </form>
+    </div>
+</div>
+
+<style>
+    #result_list { width: 100%; border-collapse: collapse; }
+    #result_list thead th { 
+        background: #fdfbf7 !important; padding: 12px 20px !important; text-transform: uppercase; 
+        font-size: 11px; color: var(--text-muted) !important; border-bottom: 2px solid var(--border-color) !important;
+        text-align: left !important;
+    }
+    #result_list tbody td { padding: 12px 20px !important; font-size: 13px; border-bottom: 1px solid var(--border-color) !important; }
+    #result_list tbody tr:hover td { background: #f9f9f9 !important; }
+    .action-counter { display: none; }
+    #changelist-filter { display: none; }
+</style>
+{% endblock %}

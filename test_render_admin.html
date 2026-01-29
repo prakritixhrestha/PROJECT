@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PlayfairDisplay=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        .auth-container h2 {
+            margin-bottom: 20px;
+            font-family: 'Italiana', serif;
+        }
+        .auth-container input, .auth-container select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #48342c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .auth-container input, 
+    .auth-container select {
+        width: 100%;
+        padding: 12px; /* Increased padding for a more premium feel */
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box; /* CRITICAL: This keeps them perfectly aligned */
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 14px;
+    }
+
+    /* Container for the password field to hold the toggle icon */
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 40%;
+        transform: translateY(-50%); /* Centers icon vertically */
+        cursor: pointer;
+        color: #3f322b;
+        font-size: 16px;
+        z-index: 2;
+    }
+    
+    /* Ensure the input doesn't hide text behind the icon */
+    #password {
+        padding-right: 45px !important;
+    }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    
+        <h2 style="color: #48342c; font-weight: bold">Login or Register</h2>
+        <form id="auth-form" method="POST" action="/login/">
+            <input type="hidden" name="csrfmiddlewaretoken" value="yanc97qvmND8T8tgtIhrDMqR9gglW0X9O3PBpdXu5bqSHCSnMx8bee3RzUzpqz32">
+            <input type="text" name="username" id="username" placeholder="Email" required>
+    
+            <div class="password-wrapper">
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <i class="fa-solid fa-eye toggle-password" id="toggleIcon" onclick="togglePass()"></i>
+            </div>
+
+            <select name="role" id="user-type" required>
+                <option value="">Select User Type</option>
+                <option value="customer">Customer</option>
+                <option value="staff">Staff</option>
+            </select>
+    
+            <button type="submit" style="font-family:'Josefin Sans', sans-serif; width: 100%; box-sizing: border-box;">Submit</button>
+        </form>
+        
+        <div style="margin-top: 20px; font-size: 14px; color: #555;">
+            <p>Don't have an account?</p>
+            <a href="/register/" class="register-btn" style="color: black">Sign Up / Register</a>
+        </div>
+    
+
+    
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    
+
+    function togglePass() {
+        const passInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("toggleIcon");
+
+        if (passInput.type === "password") {
+            passInput.type = "text";
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        } else {
+            passInput.type = "password";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        }
+    }
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        /* Card Form Container */
+        #content-main {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        fieldset { border: none; margin-bottom: 40px; padding: 0; }
+        
+        fieldset h2 {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-row { padding: 15px 0; border-bottom: 1px solid #f8f9fa; display: flex; flex-direction: column; }
+        
+        .form-row label { font-weight: bold; color: var(--sidebar-dark); margin-bottom: 8px; font-size: 13px; }
+        
+        input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], textarea, select {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; transition: 0.2s;
+        }
+        
+        input:focus { border-color: var(--primary-blue); outline: none; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+        
+        .submit-row {
+            margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: flex-end; gap: 10px;
+        }
+        
+        .submit-row input {
+            cursor: pointer; font-weight: bold; font-size: 12px; border: none; padding: 12px 25px; border-radius: 6px; text-transform: uppercase;
+        }
+        
+        .submit-row input[name="_save"] { background: var(--primary-blue); color: white; }
+        
+        .deletelink { background: var(--warning-red); color: white !important; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; margin-right: auto; }
+        
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}
+        {% block form_top %}{% endblock %}
+        
+        {% if errors %}
+            <p class="errornote" style="color: var(--warning-red); font-weight: bold; margin-bottom: 20px;">Please correct the error(s) below.</p>
+        {% endif %}
+
+        {% block field_sets %}
+            {% for fieldset in adminform %}
+            {% include "admin/includes/fieldset.html" %}
+            {% endfor %}
+        {% endblock %}
+
+        {% block after_field_sets %}{% endblock %}
+
+        {% block inline_field_sets %}
+            {% for inline_admin_formset in inline_admin_formsets %}
+                {% include inline_admin_formset.opts.template %}
+            {% endfor %}
+        {% endblock %}
+
+        {% block after_related_objects %}{% endblock %}
+
+        {% block submit_buttons_bottom %}
+            {% submit_row %}
+        {% endblock %}
+
+        {% block admin_change_form_document_ready %}
+            <script id="django-admin-form-add-constants" src="{% static 'admin/js/change_form.js' %}"
+                {% if adminform and add %}
+                    data-model-name="{{ opts.model_name }}"
+                {% endif %}
+                async>
+            </script>
+        {% endblock %}
+        {% prepopulated_fields_js %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+
+{% block title %}{% if object %}Edit Product: {{ object.name }}{% else %}Add New Product{% endif %}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 35px;">
+    <h2 style="font-size: 24px; font-weight: 700;">{% if object %}Edit Product: {{ object.name }}{% else %}Add New Product{% endif %}</h2>
+    <p style="color: var(--text-muted);">Configure product details and stock status.</p>
+</div>
+
+<div class="data-container" style="max-width: 800px;">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            {% for field in form %}
+            <div style="{% if field.name == 'description' %}grid-column: span 2;{% endif %} margin-bottom: 10px;">
+                <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">{{ field.label }}</label>
+                
+                {% if field.field.widget.input_type == 'checkbox' %}
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px;">
+                        {{ field }}
+                        <span style="font-size: 13px; color: var(--text-main);">{{ field.label }}</span>
+                    </div>
+                {% elif field.name == 'image' %}
+                    <div style="padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px;">
+                        {{ field }}
+                    </div>
+                {% else %}
+                    <div style="width: 100%;">
+                        {{ field }}
+                    </div>
+                {% endif %}
+
+                {% if field.help_text %}
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div style="color: var(--danger); font-size: 11px; margin-top: 5px; font-weight: 600;">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="display: flex; gap: 15px; margin-top: 40px; padding-top: 25px; border-top: 1px solid #f8f9fa;">
+            <button type="submit" class="btn-unified" style="border: none; cursor: pointer; padding: 12px 35px;">Save Product</button>
+            <a href="{% url 'admin-custom:products-list' %}" class="btn-unified" style="background: #eee; color: #666; border: none; text-align: center; text-decoration: none; padding: 12px 35px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input[type="text"], input[type="number"], select, textarea {
+        width: 100% !important;
+        padding: 12px !important;
+        border: 1px solid #f0f0f0 !important;
+        border-radius: 10px !important;
+        font-family: inherit !important;
+        font-size: 14px !important;
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: none !important;
+        border-color: var(--accent-primary) !important;
+    }
+</style>
+{% endblock %}

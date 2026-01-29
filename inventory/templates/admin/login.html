@@ -1,0 +1,196 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Josefin+Sans:wght@300;400;600&display=swap"
+    rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f4f1ea;
+        font-family: 'Josefin Sans', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    #container {
+        width: 100%;
+        max-width: 450px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin: 20px;
+        padding: 0 !important;
+    }
+
+    #header {
+        background: #4b2e1e;
+        color: #fff;
+        padding: 30px;
+        text-align: center;
+        border: none !important;
+    }
+
+    #branding h1 {
+        margin: 0;
+        font-family: 'Italiana', serif;
+        font-size: 32px;
+        color: #fff !important;
+        letter-spacing: 1px;
+    }
+
+    #content-main {
+        padding: 40px;
+        float: none !important;
+        width: 100% !important;
+    }
+
+    .form-row {
+        margin-bottom: 25px;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #eee;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        background: #fcfcfc;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        border-color: #4b2e1e;
+        outline: none;
+    }
+
+    .submit-row {
+        margin-top: 30px;
+        padding: 0 !important;
+        background: none !important;
+        border: none !important;
+        text-align: center;
+        display: block !important;
+    }
+
+    input[type="submit"] {
+        background: #4b2e1e;
+        color: #fff;
+        border: none;
+        padding: 14px 40px;
+        font-size: 16px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: 'Josefin Sans', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.2s, background 0.2s;
+        width: 100%;
+    }
+
+    input[type="submit"]:hover {
+        background: #5a3b2e;
+        transform: translateY(-2px);
+    }
+
+    .errornote {
+        background: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ef9a9a;
+    }
+
+    .password-reset-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .password-reset-link a {
+        color: #888;
+        text-decoration: none;
+    }
+
+    .password-reset-link a:hover {
+        color: #4b2e1e;
+    }
+
+    /* Hide sidebar if present */
+    #sidebar {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block content %}
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate
+    "Please correct the errors below." %}{% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
+<div id="content-main">
+    {% if user.is_authenticated %}
+    <p class="errornote">
+        {% blocktranslate trimmed with username=user.get_username %}
+        You are authenticated as {{ username }}, but are not authorized to
+        access this page. Would you like to login to a different account?
+        {% endblocktranslate %}
+    </p>
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+        <div class="form-row">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+        <div class="password-reset-link">
+            <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+        </div>
+        {% endif %}
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'Log in' %}">
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+{% load static %}
+
+{% block title %}Website Settings{% endblock %}
+
+{% block content %}
+<h2 style="font-size: 24px; font-weight: 700; margin-bottom: 30px;">Website Content Settings</h2>
+
+<div class="data-container">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <!-- LEFT COLUMN: HEADER & FOOTER -->
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--accent-primary);">Header & Footer</h3>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Header Title</label>
+                    <input type="text" name="header_title" value="{{ content.header_title }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Footer Text</label>
+                    <textarea name="footer_text" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px; height: 80px;">{{ content.footer_text }}</textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Office Address</label>
+                    <input type="text" name="footer_address" value="{{ content.footer_address }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Contact Email</label>
+                        <input type="email" name="contact_email" value="{{ content.contact_email }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Contact Phone</label>
+                        <input type="text" name="contact_phone" value="{{ content.contact_phone }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: FEATURED & ABOUT -->
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--accent-primary);">Special Assets</h3>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Featured Title (Banner)</label>
+                    <input type="text" name="featured_title" value="{{ content.featured_title }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Featured Subtitle</label>
+                    <input type="text" name="featured_subtitle" value="{{ content.featured_subtitle }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Featured Image (Banner)</label>
+                    {% if content.featured_image %}
+                        <img src="{{ content.featured_image.url }}" style="height: 100px; border-radius: 10px; margin: 10px 0; display: block;">
+                    {% endif %}
+                    <input type="file" name="featured_image" style="font-size: 12px;">
+                </div>
+                <hr style="border: 0; border-top: 1px solid #f0f0f0; margin: 30px 0;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">About Page Title</label>
+                    <input type="text" name="about_title" value="{{ content.about_title }}" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">About Us Content</label>
+                    <textarea name="about_content" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-top: 5px; height: 100px;">{{ content.about_content }}</textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">About Page Image</label>
+                    {% if content.about_image %}
+                        <img src="{{ content.about_image.url }}" style="height: 100px; border-radius: 10px; margin: 10px 0; display: block;">
+                    {% endif %}
+                    <input type="file" name="about_image" style="font-size: 12px;">
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+            <button type="submit" class="btn-unified" style="border:none; cursor:pointer;">Update Website Content</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

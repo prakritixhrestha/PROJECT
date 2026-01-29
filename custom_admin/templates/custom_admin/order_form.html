@@ -1,0 +1,92 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+
+{% block title %}Edit Order #{{ object.id }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 35px;">
+    <h2 style="font-size: 24px; font-weight: 700;">Edit Order #{{ object.tracking_number|default:object.id }}</h2>
+    <p style="color: var(--text-muted);">Update order status and payment details.</p>
+</div>
+
+<div class="data-container" style="max-width: 600px;">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 25px;">
+            <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Order Status</label>
+            <select name="status" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px; font-family: inherit;">
+                {% for code, label in object.STATUS_CHOICES %}
+                    <option value="{{ code }}" {% if object.status == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Payment Status</label>
+            <select name="payment_status" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px; font-family: inherit;">
+                <option value="Pending" {% if object.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Completed" {% if object.payment_status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Failed" {% if object.payment_status == 'Failed' %}selected{% endif %}>Failed</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <button type="submit" class="btn-unified" style="border: none; cursor: pointer; flex: 1;">Update Order</button>
+            <a href="{% url 'admin-custom:orders-list' %}" class="btn-unified" style="background: #eee; color: #666; border: none; text-align: center; flex: 1; text-decoration: none;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="data-container" style="margin-top: 30px;">
+    <h3 style="font-size: 16px; margin-bottom: 20px;">Detailed Order Information</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Customer</div>
+            <div style="font-weight: 700; margin-top: 5px;">{{ object.customer.get_full_name|default:object.customer.username }}</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Email: {{ object.customer.email }}</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tracking Details</div>
+            <div style="font-weight: 700; margin-top: 5px; color: var(--info);">{{ object.tracking_number }}</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Date: {{ object.order_date|date:"F d, Y H:i" }}</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Payment Info</div>
+            <div style="font-weight: 700; margin-top: 5px;">Rs {{ object.total_price }}</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Method: {{ object.payment_method }} ({{ object.payment_status }})</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Delivery Contact</div>
+            <div style="font-weight: 700; margin-top: 5px;">{{ object.delivery_phone|default:"Not Provided" }}</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Request Date: {{ object.estimated_delivery_date|date:"F d, Y" }}</div>
+        </div>
+    </div>
+
+
+    <hr style="border: none; border-top: 1px solid #f0f0f0; margin: 20px 0;">
+
+    <div style="margin-bottom: 25px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Delivery Address</div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid var(--info); font-size: 14px; line-height: 1.6;">
+            {{ object.delivery_address|linebreaksbr|default:"No address provided" }}
+        </div>
+    </div>
+
+    {% if object.delivery_instructions %}
+    <div style="margin-bottom: 25px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Delivery Instructions</div>
+        <div style="background: #fff8e1; padding: 15px; border-radius: 8px; font-size: 13px; font-style: italic; color: #856404;">
+            "{{ object.delivery_instructions }}"
+        </div>
+    </div>
+    {% endif %}
+
+    <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Order Items Summary</div>
+        <div style="background: white; border: 1px solid #eee; padding: 15px; border-radius: 8px;">
+            <pre style="white-space: pre-wrap; font-family: inherit; margin: 0; font-size: 14px;">{{ object.items_summary }}</pre>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

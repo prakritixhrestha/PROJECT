@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FURNIQ Admin | {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'custom_admin/css/admin_unified.css' %}">
+    {% block extrastyle %}{% endblock %}
+</head>
+<body class="admin-body">
+
+    {% if not is_popup and user.is_authenticated and user.is_staff %}
+    <div class="admin-sidebar">
+        <div class="sidebar-logo">FURNIQ Admin</div>
+        <nav class="sidebar-nav">
+            <div style="padding: 10px 25px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">Menu</div>
+            <a href="/admin/dashboard/" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/django-admin/inventory/order/" class="nav-link {% if 'inventory/order' in request.path %}active{% endif %}">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+            <a href="/django-admin/inventory/product/" class="nav-link {% if 'inventory/product' in request.path %}active{% endif %}">
+                <i class="fas fa-couch"></i> Products
+            </a>
+
+            <div style="padding: 20px 25px 10px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">Management</div>
+            <a href="/django-admin/inventory/profile/" class="nav-link {% if 'inventory/profile' in request.path %}active{% endif %}">
+                <i class="fas fa-id-card"></i> Profiles
+            </a>
+            <a href="/django-admin/auth/user/" class="nav-link {% if 'auth/user' in request.path %}active{% endif %}">
+                <i class="fas fa-users"></i> Users
+            </a>
+
+            <div style="padding: 20px 25px 10px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">System</div>
+            <a href="/django-admin/inventory/payment/" class="nav-link {% if 'inventory/payment' in request.path %}active{% endif %}">
+                <i class="fas fa-credit-card"></i> Payments
+            </a>
+            <a href="/admin/logout/" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-main">
+        <header class="admin-header">
+            <div style="font-weight: bold; color: var(--sidebar-dark);">FURNIQ ADMINISTRATION</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: bold;">{{ user.username }}</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Admin</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    {{ user.username.0|upper }}
+                </div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+             <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;">{% block content_title %}{% endblock %}</h1>
+             
+             <div class="metrics-row">
+                 {% block metrics %}{% endblock %}
+             </div>
+
+             <main>
+                 {% block content %}{% endblock %}
+             </main>
+        </div>
+    </div>
+    {% else %}
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100%;">
+        <div style="max-width: 400px; width: 100%; border: 1px solid #ddd; padding: 40px; border-radius: 12px; background: white;">
+             {% block login_content %}{% endblock %}
+             {% block content %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extrajs %}{% endblock %}
+</body>
+</html>

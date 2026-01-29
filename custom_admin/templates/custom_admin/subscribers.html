@@ -1,0 +1,36 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+{% block title %}Subscribers{% endblock %}
+{% block page_title %}Email Subscribers{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+    <h2 style="font-size: 24px; font-weight: 700;">Newsletter Subscribers</h2>
+</div>
+
+<div class="data-container">
+    <table style="max-width: 800px;">
+        <thead>
+            <tr>
+                <th>EMAIL ADDRESS</th>
+                <th>SUBSCRIBED ON</th>
+                <th style="text-align: right;">STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in subscribers %}
+            <tr>
+                <td style="font-weight: 700; color: var(--text-main);">{{ s.email }}</td>
+                <td style="color: var(--text-muted);">{{ s.subscribed_at|date:"M d, Y" }}</td>
+                <td style="text-align: right;">
+                    <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-size: 9px;">ACTIVE</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">No newsletter subscribers yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

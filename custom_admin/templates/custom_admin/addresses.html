@@ -1,0 +1,54 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+{% block title %}Addresses{% endblock %}
+{% block page_title %}Stored Addresses{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+    <h2 style="font-size: 24px; font-weight: 700;">Customer Delivery Addresses</h2>
+</div>
+
+<div class="data-container">
+    <table>
+        <thead>
+            <tr>
+                <th>CUSTOMER</th>
+                <th>LABEL</th>
+                <th>FULL NAME</th>
+                <th>PHONE</th>
+                <th>CITY</th>
+                <th>DEFAULT</th>
+                <th style="text-align: right;">ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for addr in addresses %}
+            <tr>
+                <td>
+                    <div style="font-weight: 700;">{{ addr.user.get_full_name|default:addr.user.username }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">@{{ addr.user.username }}</div>
+                </td>
+                <td><span class="badge" style="background: #f8f9fa; color: #4b2e1e;">{{ addr.label|upper }}</span></td>
+                <td style="font-weight: 600;">{{ addr.full_name }}</td>
+                <td style="color: var(--text-muted);">{{ addr.phone }}</td>
+                <td style="color: var(--text-muted);">{{ addr.city }}, {{ addr.state }}</td>
+                <td>
+                    {% if addr.is_default %}
+                        <span style="color: var(--success); font-weight: 700;"><i class="fas fa-check-circle"></i> YES</span>
+                    {% else %}
+                        <span style="color: var(--text-muted);">NO</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <a href="#" style="color: var(--text-muted);"><i class="fas fa-edit"></i></a>
+                    <a href="#" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">No saved addresses found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 70vh;">
+    <div style="margin-bottom: 40px;">
+        <h2 style="font-family: 'Italiana', serif; font-size: 2rem; color: #4b2e1e;">Results for "{{ query }}"</h2>
+        <div style="width: 60px; height: 3px; background: #c9b8a3; margin-top: 10px;"></div>
+    </div>
+
+    <div class="row g-4">
+        {% for product in results %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden; height: 100%;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'images/default.jpg' %}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title" style="font-family: 'Italiana', serif; font-weight: bold;">{{ product.name }}</h5>
+                    <p class="text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">{{ product.category }}</p>
+                    <p class="fw-bold" style="font-size: 1.1rem; color: #4b2e1e; margin-bottom: 20px;">Rs {{ product.price }}</p>
+                    
+                    <div class="mt-auto">
+                        <button class="btn btn-brown w-100" style="border-radius: 25px; padding: 10px;" onclick="addToCart('{{ product.name|escapejs }}')">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div style="font-size: 4rem; color: #f0ebe6; margin-bottom: 20px;"><i class="fas fa-search"></i></div>
+            <p style="font-size: 1.2rem; color: #8c7b70;">No products found matching your search.</p>
+            <a href="{% url 'home' %}" class="btn btn-brown mt-3 px-5" style="border-radius: 25px;">Back to Collections</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function addToCart(productName) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        cart[productName] = (cart[productName] || 0) + 1;
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        if (typeof showToast === 'function') {
+            showToast(`${productName} added to cart!`);
+        }
+        if (typeof updateCartBadgeGlobal === 'function') {
+            updateCartBadgeGlobal();
+        }
+    }
+</script>
+{% endblock %}

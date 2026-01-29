@@ -1,0 +1,194 @@
+/* Django Admin Theme Overlay (Matches Custom Admin) */
+
+:root {
+    /* DEFAULT DARK THEME */
+    --body-bg: #1a1d23;
+    --body-fg: #e4e6eb;
+    --body-quiet-color: #b0b3b8;
+    --body-loud-color: #ffffff;
+
+    --header-bg: #23272f;
+    --header-color: #d4a574;
+    --header-link-color: #e4e6eb;
+    
+    --module-bg: #23272f;
+    --breadcrumbs-bg: #1a1d23;
+    --breadcrumbs-fg: #b0b3b8;
+    
+    --link-fg: #d4a574;
+    --link-hover-color: #8b6f47;
+    
+    --button-bg: #d4a574;
+    --button-fg: #ffffff;
+    --button-hover-bg: #8b6f47;
+    
+    --object-tools-bg: #2c313a;
+    --object-tools-fg: #e4e6eb;
+    
+    --accent: #d4a574;
+    --hairline-color: #3a3f4b;
+    --error-fg: #dc3545;
+    
+    /* Dark scrollbar */
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --body-bg: #ffffff;
+    --body-fg: #1a1d23;
+    --body-quiet-color: #6c757d;
+    --body-loud-color: #000000;
+
+    --header-bg: #f8f9fa;
+    --header-color: #d4a574;
+    --header-link-color: #1a1d23;
+    
+    --module-bg: #ffffff;
+    --breadcrumbs-bg: #f8f9fa;
+    --breadcrumbs-fg: #6c757d;
+    
+    --link-fg: #d4a574;
+    --link-hover-color: #8b6f47;
+    
+    --button-bg: #d4a574;
+    --button-fg: #ffffff;
+    --button-hover-bg: #8b6f47;
+    
+    --object-tools-bg: #e9ecef;
+    --object-tools-fg: #1a1d23;
+    
+    --hairline-color: #dee2e6;
+    
+    /* Light scrollbar */
+    color-scheme: light;
+}
+
+/* Base Overrides */
+body {
+    background: var(--body-bg);
+    color: var(--body-fg);
+}
+
+/* Header */
+#header {
+    background: var(--header-bg);
+    color: var(--header-color);
+    border-bottom: 2px solid var(--accent);
+}
+
+#header a:link, #header a:visited {
+    color: var(--header-link-color);
+}
+
+#header .branding h1 {
+    color: var(--accent);
+}
+
+/* Modules / Cards */
+.module {
+    background: var(--module-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.module caption, .module h2 {
+    background: var(--object-tools-bg);
+    color: var(--body-fg);
+}
+
+/* Links */
+a:link, a:visited {
+    color: var(--link-fg);
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Buttons */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--button-bg);
+    color: var(--button-fg);
+    border: none;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: var(--button-hover-bg);
+}
+
+/* Breadcrumbs */
+div.breadcrumbs {
+    background: var(--breadcrumbs-bg);
+    color: var(--breadcrumbs-fg);
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+/* Form Rows */
+.form-row {
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+/* Inputs */
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], textarea, select, .vTextField {
+    background: var(--body-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+    padding: 6px;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* Dashboard List */
+#content-related {
+    background: var(--module-bg);
+}
+
+#content-related h3 {
+    color: var(--accent);
+}
+
+/* Back Link */
+.custom-back-link {
+    display: inline-block;
+    padding: 10px 15px;
+    background: var(--object-tools-bg);
+    color: var(--body-fg) !important;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.custom-back-link:hover {
+    background: var(--accent);
+    color: #fff !important;
+}
+
+/* ========== QUALITY RULES: NO ZEBRA ROWS & STICKY HEADER ========== */
+
+/* Force row backgrounds to be solid/transparent */
+tr.row1, tr.row2 {
+    background: transparent !important;
+}
+
+/* Modern Hover Effect */
+tbody tr:hover, tbody tr:hover td, tbody tr:hover th {
+    background-color: rgba(212, 165, 116, 0.1) !important; /* Gold tint */
+    transition: background-color 0.2s ease;
+}
+
+/* Sticky Header for Tables */
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--module-bg);
+    box-shadow: 0 1px 0 var(--hairline-color); /* Separator line */
+}

@@ -1,0 +1,200 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<script>
+    function addToCart(productName) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        cart[productName] = (cart[productName] || 0) + 1;
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Use global feedback system
+        if (typeof showToast === 'function') {
+            showToast(`${productName} added to cart!`);
+        }
+        if (typeof updateCartBadgeGlobal === 'function') {
+            updateCartBadgeGlobal();
+        }
+    }
+</script>
+<style>
+    /* Hero Section Styles */
+    /* 1. The container stays fixed in size */
+    .category-card {
+        position: relative;
+        overflow: hidden;
+        /* This crops the image so it doesn't push other items */
+        transition: box-shadow 0.3s ease;
+        width: 328px;
+        /* Matching 280px image + 24px padding on both sides */
+        height: 328px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 2. Only the image zooms, not the box */
+    .category-link:hover .category-card img {
+        transform: scale(1.1);
+        /* Zoom inside the box */
+    }
+
+    /* 3. Smooth transition for the image */
+    .category-card img {
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* 4. Shadow effect without moving the box */
+    .category-link:hover .category-card {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .category-link {
+        text-decoration: none !important;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section" style="position:relative;">
+    {% if content.featured_image %}
+    <img src="{{ content.featured_image.url }}" alt="Hero" style="width:100%; height:420px; object-fit:cover;">
+    {% else %}
+    <img src="{% static 'images/hero_v6.jpg' %}" alt="Living Room" style="width:100%; height:420px; object-fit:cover;">
+    {% endif %}
+    
+    <h1 style="
+        position:absolute;
+        top:20%;
+        left:49%;
+        transform:translate(-50%,-50%);
+        color:#5a3b2e;
+        font-family:'Italiana', serif;
+        font-size:42px;
+        font-weight:500;
+        text-align:center;
+        width:100%;
+        font-weight: bold;
+        ">
+        {{ content.featured_title|default:"Where comfort meets class" }}
+    </h1>
+</div>
+
+<!-- Welcome Message -->
+<div style="background:#fff; padding:40px 0; text-align:center;">
+    <h2
+        style="font-weight: bold; font-family:'Italiana',serif; font-size:32px; letter-spacing:2px; margin-bottom:18px;">
+        WELCOME TO THE {{ content.header_title|default:"FURNIQ"|upper }}
+    </h2>
+    <p style="font-family:'Italiana',serif; font-size:20px;font-weight: bold;">
+        {{ content.featured_subtitle|default:"Your ultimate solution of quality home!" }}
+    </p>
+</div>
+
+<!-- Featured Products Section -->
+<div class="container my-5">
+    <h2 class="featured-title"
+        style="font-weight: bold; font-family:'Italiana',serif; font-size:28px; margin-bottom:10px; text-align:left;">
+        Featured Products
+    </h2>
+    <p class="featured-subtitle"
+        style="font-weight: bold; font-family:'Italiana',serif; font-size:18px; margin-bottom:40px; text-align:left; color:#333;">
+        Some of our best selling products
+    </p>
+    <div class="row g-5">
+        {% for product in products %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm" style="border-radius:24px;">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                    style="border-radius:24px; height:270px; object-fit: cover;">
+                {% else %}
+                <img src="{% static 'images/default.jpg' %}" class="card-img-top"
+                    style="border-radius:24px; height:270px; object-fit: cover;">
+                {% endif %}
+
+                <div class="card-body text-left px-3">
+                    <div style="font-family:'Italiana',serif; font-size:20px; font-weight: bold;">{{ product.name }}
+                    </div>
+
+                    <div style="font-family:'Italiana',serif; font-size:17px; font-weight: bold;">
+                        Rs {{ product.price }}
+
+                        {% if product.old_price %}
+                        <span
+                            style="text-decoration: line-through; color: #888; margin-left: 10px; font-weight: normal;">
+                            Rs {{ product.old_price }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No products available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Creative Collection Section -->
+<div class="container-fluid py-5" style="background:#cfc7bd;">
+    <div class="row align-items-center justify-content-center">
+        <div class="col-lg-6 px-5">
+            <h2 style="font-family:'Italiana',serif; font-size:38px; margin-bottom:18px;font-weight: bold;">
+                Introducing Creative Collection For Your Interior
+            </h2>
+            <p style="font-family:'Italiana-serif', serif; font-size:28px;">
+                Transform your space with FurniQ, where innovative design meets effortless management, turning your
+                furniture vision into reality.
+            </p>
+        </div>
+        <div class="col-lg-5 d-flex justify-content-center">
+            <img src="{% static 'images/Creative collection.jpeg' %}" alt="Creative Collection" class="img-fluid shadow"
+                style="border-radius:32px; max-width:20%; min-width:280px;">
+        </div>
+    </div>
+</div>
+
+<!-- Explore the Collection Section -->
+<div class="container my-5">
+    <h2 style="font-family:'Italiana',serif; font-size:24px; margin-bottom:32px;font-weight: bold;">
+        Explore the collection
+    </h2>
+    <div class="row justify-content-center">
+        <div class="col-md-4 d-flex flex-column align-items-center mb-4">
+            <a href="{% url 'dining' %}" class="category-link text-decoration-none text-dark">
+                <div class="category-card shadow-sm bg-white" style="border-radius:8px; padding:24px; overflow:hidden;">
+                    <img src="{% static 'images/Dining.jpeg' %}" alt="Dining"
+                        style="width:280px; height:280px; object-fit:contain; transition: transform 0.3s ease;">
+                </div>
+                <div style="font-family:'Italiana',serif; font-size:20px; margin-top:12px; text-align:center;">
+                    Dining</div>
+            </a>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column align-items-center mb-4">
+            <a href="{% url 'livingroom' %}" class="category-link text-decoration-none text-dark">
+                <div class="category-card shadow-sm bg-white" style="border-radius:8px; padding:24px; overflow:hidden;">
+                    <img src="{% static 'images/Living Room.jpeg' %}" alt="Living Room"
+                        style="width: 280px; height:280px; object-fit:contain; transition: transform 0.3s ease;">
+                </div>
+                <div style="font-family:'Italiana',serif; font-size:20px; margin-top:12px; text-align:center;">
+                    Living Room</div>
+            </a>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column align-items-center mb-4">
+            <a href="{% url 'bedroom' %}" class="category-link text-decoration-none text-dark">
+                <div class="category-card shadow-sm bg-white" style="border-radius:8px; padding:24px; overflow:hidden;">
+                    <img src="{% static 'images/Bedroom.jpeg' %}" alt="Bedroom"
+                        style="width:280px; height:280px; object-fit:contain; transition: transform 0.3s ease;">
+                </div>
+                <div style="font-family:'Italiana',serif; font-size:20px; margin-top:12px; text-align:center;">
+                    Bedroom</div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

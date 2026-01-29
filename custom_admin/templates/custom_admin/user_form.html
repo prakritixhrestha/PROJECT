@@ -1,0 +1,59 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+
+{% block title %}{% if object %}Edit User: {{ object.username }}{% else %}Add New User{% endif %}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 35px;">
+    <h2 style="font-size: 24px; font-weight: 700;">{% if object %}Edit User: {{ object.username }}{% else %}Add New User{% endif %}</h2>
+    <p style="color: var(--text-muted);">Manage system account access and permissions.</p>
+</div>
+
+<div class="data-container" style="max-width: 600px;">
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div style="margin-bottom: 25px;">
+            <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">{{ field.label }}</label>
+            
+            {% if field.field.widget.input_type == 'checkbox' %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px;">
+                    {{ field }}
+                    <span style="font-size: 13px; color: var(--text-main);">{{ field.label }}</span>
+                </div>
+            {% else %}
+                <div style="width: 100%;">
+                    {{ field }}
+                </div>
+            {% endif %}
+
+            {% if field.help_text %}
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+                <div style="color: var(--danger); font-size: 11px; margin-top: 5px; font-weight: 600;">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <div style="display: flex; gap: 15px; margin-top: 30px; padding-top: 25px; border-top: 1px solid #f8f9fa;">
+            <button type="submit" class="btn-unified" style="border: none; cursor: pointer; padding: 12px 35px;">Save Account</button>
+            <a href="{% url 'admin-custom:users-list' %}" class="btn-unified" style="background: #eee; color: #666; border: none; text-align: center; text-decoration: none; padding: 12px 35px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input[type="text"], input[type="email"], input[type="password"], select {
+        width: 100% !important;
+        padding: 12px !important;
+        border: 1px solid #f0f0f0 !important;
+        border-radius: 10px !important;
+        font-family: inherit !important;
+        font-size: 14px !important;
+    }
+    input:focus, select:focus {
+        outline: none !important;
+        border-color: var(--accent-primary) !important;
+    }
+</style>
+{% endblock %}

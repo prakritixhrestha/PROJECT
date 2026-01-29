@@ -1,0 +1,153 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(75, 46, 30, 0.7), rgba(75, 46, 30, 0.7)),
+        url('{% static "images/hero_v6.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .hero-title {
+        font-size: 56px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .content-section {
+        padding: 80px 0;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .section-title {
+        font-size: 42px;
+        font-weight: 700;
+        color: #4b2e1e;
+        margin-bottom: 40px;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .about-text {
+        font-size: 20px;
+        line-height: 1.8;
+        color: #444;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .feature-box {
+        text-align: center;
+        padding: 40px 20px;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-box:hover {
+        transform: translateY(-10px);
+    }
+
+    .feature-icon {
+        font-size: 54px;
+        color: #8B6F47;
+        margin-bottom: 25px;
+    }
+
+    .feature-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #4b2e1e;
+        margin-bottom: 15px;
+    }
+
+    .feature-desc {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    .mission-container {
+        background-color: #fdfcfb;
+        border-radius: 20px;
+        padding: 60px;
+        margin-top: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section" style="{% if content.about_image %}background: linear-gradient(rgba(75, 46, 30, 0.7), rgba(75, 46, 30, 0.7)), url('{{ content.about_image.url }}'); background-size: cover; background-position: center;{% endif %}">
+    <h1 class="hero-title">About {{ content.header_title|default:"FurniQ" }}</h1>
+</div>
+
+<!-- About Content -->
+<div class="content-section">
+    <div class="container">
+        <h2 class="section-title">{{ content.about_title|default:"Where Comfort Meets Class" }}</h2>
+        <p class="about-text">
+            {{ content.about_content|default:"FurniQ is your ultimate destination for quality home furniture. We believe that every home deserves beautiful, comfortable, and durable furniture that reflects your personal style. With years of experience in the furniture industry, we curate the finest pieces to transform your living spaces into havens of comfort and elegance." }}
+        </p>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="content-section" style="background-color: #f9f7f4;">
+    <div class="container">
+        <h2 class="section-title">Why Choose FurniQ?</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="fas fa-couch"></i></div>
+                    <div class="feature-title">Quality Products</div>
+                    <div class="feature-desc">Premium furniture pieces crafted with the finest materials and meticulous attention to detail.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="fas fa-truck"></i></div>
+                    <div class="feature-title">Fast Delivery</div>
+                    <div class="feature-desc">Quick, tracked, and reliable delivery services straight to your preferred location.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <div class="feature-title">Customer Support</div>
+                    <div class="feature-desc">Our dedicated support team is always ready to assist you with any inquiries or concerns.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="feature-title">Secure Payment</div>
+                    <div class="feature-desc">Fully encrypted and safe payment gateways ensuring your financial transactions are protected.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mission Section -->
+<div class="content-section">
+    <div class="container">
+        <div class="mission-container text-center">
+            <h2 class="section-title">Our Mission</h2>
+            <p class="about-text">
+                Our mission is to make quality furniture accessible to everyone. We strive to provide an exceptional
+                shopping experience, from browsing our collection to receiving your furniture at home. Every piece we 
+                offer is selected with care, ensuring it meets our high standards of quality, design, and exceptional value.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

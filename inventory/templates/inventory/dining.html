@@ -1,0 +1,159 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .btn-brown {
+        background-color: #7c5a43;
+        color: #fff;
+        border-radius: 20px;
+    }
+
+    .btn-brown:hover {
+        background-color: #5a3b2e;
+        color: #fff;
+    }
+
+    @keyframes bounce-cart {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+    }
+
+    .cart-animate {
+        animation: bounce-cart 0.5s ease-in-out;
+        color: #7c5a43 !important;
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section Start -->
+<section class="container-fluid py-5 bg-white text-center">
+    <h1 class="display-5 fw-normal" style="letter-spacing:0.2em; font-family:'Italiana',serif;">DINING</h1>
+    <hr class="mt-4" style="border-top:2px solid #333;">
+</section>
+<!-- Hero Section End -->
+
+<div class="container py-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for product in products %}
+        {% if product.image %}
+        <div class="col mb-5">
+            <div class="card border-0 text-center h-100">
+                <div style="width: 245px; height: 245px; margin: 0 auto; overflow: hidden; border-radius: 15px;">
+                    <img src="{{ product.image.url }}" class="card-img-top">
+                </div>
+
+                <div class="card-body d-flex flex-column align-items-center">
+                    <p class="card-title mt-2" style="font-family:'Italiana',serif; font-weight: bold;">{{ product.name }}</p>
+                    <p class="text-muted" style="font-family:'Italiana',serif; font-size:18px; font-weight:bold; margin-top:-8px;">Rs {{ product.price }}</p>
+
+                    {% if product.stock > 0 %}
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <span class="me-2" style="font-size: 0.9rem; font-family:'Italiana',serif; font-weight: bold;">No. of items</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="changeQty(this, -1)">-</button>
+                        <input type="text" class="form-control form-control-sm mx-1 text-center qty-input" value="0" style="width:40px;" data-stock="{{ product.stock }}" max="{{ product.stock}}" readonly>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="changeQty(this, 1)">+</button>
+                    </div>
+                    <button class="btn btn-brown add-to-cart w-75" style="font-family:'Josefin Sans', sans-serif;" onclick="addToCart('{{ product.name|escapejs }}', this)">
+                        Add to cart
+                    </button>
+                    {% else %}
+                    <div class="text-danger fw-bold mb-3" style="font-family:'Italiana',serif;">Out of Stock</div>
+                    <button class="btn btn-secondary w-75" disabled style="background-color: #6c757d;">Sold Out</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const isUserLoggedIn = "{{ user.is_authenticated|yesno:'true,false' }}";
+
+    function changeQty(btn, delta) {
+        const input = btn.parentElement.querySelector('.qty-input');
+        const maxStock = parseInt(input.getAttribute('data-stock')) || 0;
+        let val = parseInt(input.value) || 0;
+        val = val + delta;
+
+        if (val < 0) { val = 0; } 
+        else if (val > maxStock) {
+            val = maxStock;
+            alert("Only " + maxStock + " items available in stock!");
+        }
+        input.value = val;
+    }
+
+    function addToCart(itemName, btn) {
+        if (isUserLoggedIn === "false") {
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+            return;
+        }
+
+        const qtyInput = btn.parentElement.querySelector('.qty-input');
+        const qtyToAdd = parseInt(qtyInput.value) || 0;
+        const maxStock = parseInt(qtyInput.getAttribute('data-stock'));
+
+        if (qtyToAdd > 0) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || {};
+            const currentInCart = cart[itemName] || 0;
+
+            if (currentInCart + qtyToAdd > maxStock) {
+                showToast("Only " + (maxStock - currentInCart) + " more can be added of this item.", "error");
+                return;
+            }
+
+            cart[itemName] = currentInCart + qtyToAdd;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Global Updates
+            if (typeof showToast === 'function') {
+                showToast(`${qtyToAdd} × ${itemName} added to cart!`);
+            }
+            if (typeof updateCartBadgeGlobal === 'function') {
+                updateCartBadgeGlobal();
+            }
+
+            qtyInput.value = 0;
+        } else {
+            showToast("Please select at least 1 item.", "error");
+        }
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || {};
+        const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
+        const badge = document.getElementById('cart-count');
+
+        if (badge) {
+            badge.textContent = totalItems;
+            badge.style.display = totalItems > 0 ? 'inline-block' : 'none';
+        }
+    }
+</script>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="font-family: 'Italiana', serif;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Sign In Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>To provide you with the best experience, please sign in to add items to your cart.</p>
+                <a href="{% url 'user' %}" class="btn btn-brown w-100 py-2">Go to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

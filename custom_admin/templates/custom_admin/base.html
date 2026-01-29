@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FurniQ Admin{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'custom_admin/css/admin_unified.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+
+    <!-- UNIFIED SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="sidebar-logo">FURNIQ Admin</div>
+        
+        <nav class="sidebar-nav">
+            <div style="padding: 10px 25px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">Menu</div>
+            <a href="/admin/dashboard/" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/django-admin/inventory/order/" class="nav-link">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+            <a href="/django-admin/inventory/product/" class="nav-link">
+                <i class="fas fa-couch"></i> Products
+            </a>
+
+            <div style="padding: 20px 25px 10px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">Management</div>
+            <a href="/admin/staff-verification/" class="nav-link {% if 'verification' in request.path %}active{% endif %}">
+                <i class="fas fa-user-shield"></i> Verification
+            </a>
+            <a href="/django-admin/inventory/profile/" class="nav-link">
+                <i class="fas fa-id-card"></i> Profiles
+            </a>
+            <a href="/django-admin/auth/user/" class="nav-link">
+                <i class="fas fa-users"></i> Users
+            </a>
+
+            <div style="padding: 20px 25px 10px; font-size: 11px; font-weight: bold; color: #5d6d7e; text-transform: uppercase;">System</div>
+            <a href="/django-admin/inventory/payment/" class="nav-link">
+                <i class="fas fa-credit-card"></i> Payments
+            </a>
+            <a href="/django-admin/inventory/orderstatushistory/" class="nav-link">
+                <i class="fas fa-history"></i> History
+            </a>
+            <a href="/django-admin/inventory/notification/" class="nav-link">
+                <i class="fas fa-bell"></i> Alerts
+            </a>
+            <a href="/admin/logout/" class="nav-link" style="color: var(--warning-red); margin-top: 20px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div class="admin-main">
+        <header class="admin-header">
+            <div class="search-wrapper">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: var(--text-muted);"></i>
+                <input type="text" class="search-input" placeholder="Search...">
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="text-align: right;">
+                    <div style="font-weight: bold; color: var(--sidebar-dark);">{{ user.username }}</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Administrator</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    {{ user.username.0|upper }}
+                </div>
+            </div>
+        </header>
+
+        {% if messages %}
+        <div style="padding: 20px 40px 0;">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}" style="padding: 15px; border-radius: 6px; background: #e3f2fd; color: #1976d2; border-left: 5px solid var(--primary-blue); margin-bottom: 15px;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

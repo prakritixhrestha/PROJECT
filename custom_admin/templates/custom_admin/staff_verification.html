@@ -1,0 +1,116 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Staff Verification{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Staff Verification</h1>
+    <p class="page-subtitle">Review and approve staff access requests</p>
+</div>
+
+<!-- Pending Approvals -->
+<div class="card" style="margin-bottom: 32px;">
+    <h3 class="card-title">Pending Approvals ({{ pending_staff.count }})</h3>
+    
+    {% if pending_staff %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">User</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Email</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Phone</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Registered</th>
+                <th style="padding: 16px; text-align: right; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profile in pending_staff %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent-gold); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                            {{ profile.user.username.0|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">@{{ profile.user.username }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="padding: 16px; color: var(--text-secondary);">{{ profile.user.email|default:"Not provided" }}</td>
+                <td style="padding: 16px; color: var(--text-secondary);">{{ profile.phone_number }}</td>
+                <td style="padding: 16px; color: var(--text-secondary);">{{ profile.user.date_joined|date:"M d, Y" }}</td>
+                <td style="padding: 16px; text-align: right;">
+                    <form method="POST" action="/admin/staff/approve/{{ profile.user.id }}/" style="display: inline-block; margin-right: 8px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    </form>
+                    <form method="POST" action="/admin/staff/reject/{{ profile.user.id }}/" style="display: inline-block;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+        <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 16px; color: var(--accent-gold);"></i>
+        <p style="font-size: 16px; font-weight: 600;">No pending approvals</p>
+        <p style="font-size: 14px; margin-top: 8px;">All staff requests have been processed</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Approved Staff -->
+<div class="card">
+    <h3 class="card-title">Approved Staff Members</h3>
+    
+    {% if approved_staff %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">User</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Email</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Phone</th>
+                <th style="padding: 16px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profile in approved_staff %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-weight: 700;">
+                            {{ profile.user.username.0|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">@{{ profile.user.username }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="padding: 16px; color: var(--text-secondary);">{{ profile.user.email|default:"Not provided" }}</td>
+                <td style="padding: 16px; color: var(--text-secondary);">{{ profile.phone_number }}</td>
+                <td style="padding: 16px;">
+                    <span style="padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background-color: #e8f5e9; color: #2e7d32;">
+                        <i class="fas fa-check-circle"></i> Active
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+        <p>No approved staff members yet</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

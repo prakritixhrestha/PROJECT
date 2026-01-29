@@ -1,0 +1,124 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(75, 46, 30, 0.7), rgba(75, 46, 30, 0.7)),
+        url('{% static "images/hero_v6.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .hero-title {
+        font-size: 52px;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .features-section {
+        padding: 80px 0;
+        background-color: #f9f7f4;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 56px;
+        color: #8B6F47;
+        margin-bottom: 25px;
+    }
+
+    .feature-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #4b2e1e;
+        margin-bottom: 15px;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .feature-desc {
+        color: #555;
+        line-height: 1.7;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="hero-section">
+    <h1 class="hero-title">Our Features</h1>
+</div>
+
+<!-- Features -->
+<div class="features-section">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-mouse-pointer"></i></div>
+                    <div class="feature-title">Easy Online Ordering</div>
+                    <div class="feature-desc">Browse our collection and place orders with just a few clicks. Simple,
+                        fast, and designed for your convenience.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="feature-title">Secure Payments</div>
+                    <div class="feature-desc">Multiple secure payment options including eSewa, Khalti, and Cash on
+                        Delivery. Your trust is our priority.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
+                    <div class="feature-title">Fast Delivery</div>
+                    <div class="feature-desc">Quick and reliable delivery straight to your doorstep. Every piece is handled with extreme care.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
+                    <div class="feature-title">Order Tracking</div>
+                    <div class="feature-desc">Real-time order tracking with detailed status updates. Always know the exact status of your delivery.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                    <div class="feature-title">Wishlist & Saved Items</div>
+                    <div class="feature-desc">Save your favorite pieces for later. Build your dream interior collection at your own pace.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div class="feature-title">Digital Invoices</div>
+                    <div class="feature-desc">Easily download PDF invoices for all your purchases directly from your personal dashboard.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
