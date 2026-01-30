@@ -66,9 +66,9 @@ def dashboard(request):
     yesterday = today - timezone.timedelta(days=1)
     labels = []
     sales = []
-    for i in range(7, -1, -1):
+    for i in range(6, -1, -1):
         date = today - timezone.timedelta(days=i)
-        labels.append(date.strftime('%Y')) # For the Statistics chart labels in image (2010..2015)
+        labels.append(date.strftime('%b %d')) 
         rev = Order.objects.filter(payment_status='Completed', order_date__date=date).aggregate(Sum('total_price'))['total_price__sum'] or 0
         sales.append(float(rev))
 
@@ -86,6 +86,15 @@ def dashboard(request):
     # Team Members (Latest Profiles)
     team_members = Profile.objects.select_related('user').order_by('-user__date_joined')[:4]
 
+    # Order Activity Counts (Grouping confirmed/shipped/delivered as Completed)
+    pending_count = Order.objects.filter(status='Pending').count()
+    cancelled_count = Order.objects.filter(status='Cancelled').count()
+    completed_count = Order.objects.exclude(status__in=['Pending', 'Cancelled']).count()
+    
+    # Success Rate (Completed / Total)
+    total_orders_count = Order.objects.count()
+    success_rate = min(100, int((completed_count / total_orders_count) * 100)) if total_orders_count > 0 else 0
+
     context = {
         'total_revenue': float(Order.objects.filter(payment_status='Completed').aggregate(Sum('total_price'))['total_price__sum'] or 0),
         'total_orders': total_sales_count,
@@ -96,6 +105,10 @@ def dashboard(request):
         # Adminto Chart Data
         'chart_labels': labels,
         'chart_sales': sales,
+        'completed_count': completed_count,
+        'pending_count': pending_count,
+        'cancelled_count': cancelled_count,
+        'success_rate': success_rate,
         'rev_progress': rev_progress,
         'sales_progress': sales_progress,
         'team_members': team_members,
@@ -302,12 +315,29 @@ class UserCreateView(AdminMixin, CreateView):
         user.save()
         return super().form_valid(form)
 
+class UserUpdateView(AdminMixin, UpdateView):
+    model = User
+    fields = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active']
+    template_name = 'custom_admin/user_form.html'
+    success_url = reverse_lazy('admin-custom:users-list')
+
+class UserDeleteView(AdminMixin, DeleteView):
+    model = User
+    template_name = 'custom_admin/user_confirm_delete.html'
+    success_url = reverse_lazy('admin-custom:users-list')
+
 @login_required
 @user_passes_test(is_admin)
 def toggle_staff_status(request, pk):
     u = get_object_or_404(User, pk=pk)
+    if u == request.user:
+        messages.error(request, "You cannot change your own staff status.")
+        return redirect('admin-custom:users-list')
+        
     u.is_staff = not u.is_staff
     u.save()
+    status = "enabled" if u.is_staff else "disabled"
+    messages.success(request, f"Staff status for {u.username} has been {status}.")
     return redirect('admin-custom:users-list')
 
 # 5. Payments

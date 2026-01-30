@@ -43,6 +43,7 @@ urlpatterns = [
     path('saved-items/', views.saved_items, name='saved_items'),
     path('saved-addresses/', views.saved_addresses, name='saved_addresses'),
     path('account-settings/', views.account_settings, name='account_settings'),
+    path('change-password/', views.change_password, name='change_password'),
     
     # Content Pages
     path('about/', views.about, name='about'),

@@ -233,11 +233,55 @@
     .perm-cross {
         color: #dc3545;
     }
+    /* Responsive Design */
+    @media (max-width: 991px) {
+        .staff-container {
+            flex-direction: column;
+            padding: 0 15px;
+            margin: 20px auto;
+        }
+
+        .staff-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0;
+        }
+        
+        .nav-item {
+            white-space: nowrap;
+            padding: 15px;
+            border-left: none;
+            border-bottom: 3px solid transparent;
+            flex-shrink: 0;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            border-left: none;
+            border-bottom-color: #4b2e1e;
+            background: transparent;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="staff-container">
+<!-- Hero Section Start -->
+<section class="container-fluid py-5 bg-white text-center">
+    <h1 class="display-5 fw-normal" style="letter-spacing:0.2em; font-family:'Italiana',serif; color: #4b2e1e;">STAFF PORTAL</h1>
+    <hr class="mt-4" style="border-top:2px solid #333; width: 60%; margin: 0 auto;">
+</section>
+<!-- Hero Section End -->
+
+<div class="staff-container" style="margin-top: 0;">
     <!-- Navigation Sidebar -->
     <div class="staff-sidebar">
         <div class="sidebar-profile">
@@ -249,19 +293,22 @@
         </div>
 
         <div class="nav-menu">
-            <a onclick="showSection('dashboard')" class="nav-item active" id="nav-dashboard">
+            <a onclick="showSection('dashboard')" class="nav-item {% if active_tab == 'dashboard' %}active{% endif %}" id="nav-dashboard">
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
-            <a onclick="showSection('profile')" class="nav-item" id="nav-profile">
-                <i class="fas fa-user-tie"></i> Staff Profile
+            <a onclick="showSection('profile')" class="nav-item {% if active_tab == 'profile' %}active{% endif %}" id="nav-profile">
+                <i class="fas fa-user-tie"></i> {% if user.is_superuser %}Admin Profile{% else %}Staff Profile{% endif %}
             </a>
-            <a onclick="showSection('tasks')" class="nav-item" id="nav-tasks">
+            <a onclick="showSection('tasks')" class="nav-item {% if active_tab == 'tasks' %}active{% endif %}" id="nav-tasks">
                 <i class="fas fa-tasks"></i> Work Management
             </a>
-            <a onclick="showSection('activity')" class="nav-item" id="nav-activity">
+            <a onclick="showSection('inventory')" class="nav-item {% if active_tab == 'inventory' %}active{% endif %}" id="nav-inventory">
+                <i class="fas fa-boxes"></i> Manage Inventory
+            </a>
+            <a onclick="showSection('activity')" class="nav-item {% if active_tab == 'activity' %}active{% endif %}" id="nav-activity">
                 <i class="fas fa-history"></i> Activity Log
             </a>
-            <a onclick="showSection('security')" class="nav-item" id="nav-security">
+            <a onclick="showSection('security')" class="nav-item {% if active_tab == 'security' %}active{% endif %}" id="nav-security">
                 <i class="fas fa-shield-alt"></i> Access & Security
             </a>
         </div>
@@ -278,7 +325,7 @@
     <div class="staff-content">
 
         <!-- 1. Dashboard Section -->
-        <div id="dashboard" class="content-section active">
+        <div id="dashboard" class="content-section {% if active_tab == 'dashboard' %}active{% endif %}">
             <div class="section-header">
                 Staff Dashboard
                 <span class="badge bg-success" style="font-size: 12px; font-family: sans-serif;">System Online</span>
@@ -287,15 +334,15 @@
             <div class="dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-label">Tasks Handled</div>
+                    <div class="stat-value">{{ tasks_handled }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Orders</div>
                     <div class="stat-value">{{ assigned_count }}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Pending Reviews</div>
-                    <div class="stat-value">3</div> <!-- Mock Data -->
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Hours Logged</div>
-                    <div class="stat-value">142</div> <!-- Mock Data -->
+                    <div class="stat-label">Inventory Items</div>
+                    <div class="stat-value">{{ products.count }}</div>
                 </div>
             </div>
 
@@ -311,26 +358,26 @@
         </div>
 
         <!-- 2. Profile Details Section -->
-        <div id="profile" class="content-section">
+        <div id="profile" class="content-section {% if active_tab == 'profile' %}active{% endif %}">
             <div class="section-header">Personal Information</div>
 
-            <form>
+            <form method="POST" action="{% url 'profile' %}?tab=profile">
+                {% csrf_token %}
                 <div class="row">
                     <div class="col-md-6 form-group">
                         <label class="form-label">Full Name</label>
-                        <input type="text" class="form-control" value="{{ user.get_full_name|default:user.username }}">
+                        <input type="text" name="first_name" class="form-control" value="{{ user.get_full_name|default:user.username }}">
                     </div>
                     <div class="col-md-6 form-group">
                         <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control" value="{{ user.email }}" readonly
-                            class="readonly-field">
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}">
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 form-group">
                         <label class="form-label">Contact Phone</label>
-                        <input type="text" class="form-control" value="{{ profile.phone_number }}">
+                        <input type="text" name="phone" class="form-control" value="{{ profile.phone_number }}">
                     </div>
                     <div class="col-md-6 form-group">
                         <label class="form-label">Department</label>
@@ -341,7 +388,7 @@
                 <div class="row">
                     <div class="col-md-4 form-group">
                         <label class="form-label">Role</label>
-                        <input type="text" class="form-control readonly-field" value="Staff Member" readonly>
+                        <input type="text" class="form-control readonly-field" value="{% if user.is_superuser %}Administrator{% else %}Staff Member{% endif %}" readonly>
                     </div>
                     <div class="col-md-4 form-group">
                         <label class="form-label">Staff ID</label>
@@ -355,15 +402,15 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn" style="background: #4b2e1e; color: white;">Save Changes</button>
+                <button type="submit" class="btn" style="background: #4b2e1e; color: white;">Save Changes</button>
             </form>
         </div>
 
         <!-- 3. Work Management Section -->
-        <div id="tasks" class="content-section">
+        <div id="tasks" class="content-section {% if active_tab == 'tasks' %}active{% endif %}">
             <div class="section-header">
                 Assigned Tasks & Orders
-                <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-outline-dark">Open Full View</a>
+
             </div>
 
             <table class="activity-table">
@@ -373,6 +420,7 @@
                         <th>Assigned Date</th>
                         <th>Priority</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -388,6 +436,11 @@
                             {% endif %}
                         </td>
                         <td>{{ order.status }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openUpdateModal('{{ order.id }}', '{{ order.tracking_number }}', '{{ order.status }}')">
+                                <i class="fas fa-edit"></i> Update
+                            </button>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -399,7 +452,7 @@
         </div>
 
         <!-- 4. Activity Log Section -->
-        <div id="activity" class="content-section">
+        <div id="activity" class="content-section {% if active_tab == 'activity' %}active{% endif %}">
             <div class="section-header">Activity Log</div>
             <p class="text-muted mb-3">Recent actions performed by your account.</p>
 
@@ -407,37 +460,88 @@
                 <thead>
                     <tr>
                         <th>Time</th>
-                        <th>Action</th>
+                        <th>Status</th>
                         <th>Details</th>
-                        <th>IP Address</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for activity in activities %}
                     <tr>
-                        <td>{{ today|date:"H:i A" }}</td>
-                        <td><span class="badge bg-success">Login</span></td>
-                        <td>Successful login to Staff Portal</td>
-                        <td>192.168.1.15</td>
+                        <td>{{ activity.changed_at|date:"M d, H:i A" }}</td>
+                        <td>
+                            <span class="badge bg-primary">{{ activity.new_status }}</span>
+                        </td>
+                        <td>
+                            Updated Order #{{ activity.order.tracking_number }} ({{ activity.old_status|default:"New" }} &rarr; {{ activity.new_status }})
+                            {% if activity.notes %}
+                            <br><small class="text-muted">{{ activity.notes }}</small>
+                            {% endif %}
+                        </td>
                     </tr>
-                    <!-- Mock Data -->
+                    {% empty %}
                     <tr>
-                        <td>Yesterday, 14:30</td>
-                        <td><span class="badge bg-primary">Update</span></td>
-                        <td>Updated status of Order #FNQ-9921</td>
-                        <td>192.168.1.15</td>
+                        <td colspan="3" class="text-center text-muted">No recent activity found.</td>
                     </tr>
-                    <tr>
-                        <td>Yesterday, 09:15</td>
-                        <td><span class="badge bg-info">View</span></td>
-                        <td>Viewed Inventory Report</td>
-                        <td>192.168.1.15</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
+        <!-- Inventory Section -->
+        <div id="inventory" class="content-section {% if active_tab == 'inventory' %}active{% endif %}">
+            <div class="section-header">Manage Inventory</div>
+            <p class="text-muted">Real-time inventory management. Updates affect the website immediately.</p>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Update Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
+                                        {% endif %}
+                                        <div>
+                                            <div style="font-weight: bold; color: #4b2e1e;">{{ product.name }}</div>
+                                            <div style="font-size: 12px; color: #777;">ID: {{ product.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ product.category }}</span></td>
+                                <td>
+                                    <span class="badge {% if product.stock < 5 %}bg-danger{% else %}bg-success{% endif %}" style="font-size: 14px;">
+                                        {{ product.stock }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <form action="{% url 'update_stock' product.id %}" method="POST" class="d-flex align-items-center">
+                                        {% csrf_token %}
+                                        <input type="number" name="stock" class="form-control form-control-sm me-2" value="{{ product.stock }}" min="0" style="width: 80px;">
+                                        <button type="submit" class="btn btn-sm btn-dark">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center">No products found in inventory.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 5. Security Section -->
-        <div id="security" class="content-section">
+        <div id="security" class="content-section {% if active_tab == 'security' %}active{% endif %}">
             <div class="section-header">System Access & Permissions</div>
 
             <div class="alert alert-secondary mb-4">
@@ -456,8 +560,9 @@
             <hr class="my-4">
 
             <h5 class="mb-3">Security Settings</h5>
-            <a href="{% url 'password_change' %}" class="btn btn-outline-danger"><i class="fas fa-key me-2"></i> Change
-                Password</a>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="fas fa-key me-2"></i> Change Password
+            </button>
             <button class="btn btn-outline-secondary ms-2" disabled title="Coming soon"><i
                     class="fas fa-mobile-alt me-2"></i> Setup Two-Factor Auth</button>
         </div>
@@ -476,8 +581,96 @@
         navItems.forEach(n => n.classList.remove('active'));
 
         // Show selected section
-        document.getElementById(sectionId).classList.add('active');
-        document.getElementById('nav-' + sectionId).classList.add('active');
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+            const navItem = document.getElementById('nav-' + sectionId);
+            if(navItem) navItem.classList.add('active');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            showSection(hash);
+        }
+    });
+    
+    function openUpdateModal(id, number, status) {
+        document.getElementById('modalOrderTitle').textContent = 'Order #' + number;
+        document.getElementById('updateOrderForm').action = '/staff/update-order/' + id + '/';
+        const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+        modal.show();
     }
 </script>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalOrderTitle">Update Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="updateOrderForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">New Status</label>
+                        <select name="status" class="form-select">
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'change_password' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="text-muted small mb-4">You will be required to log in again with your new password after this change.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="old_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="new_password1" class="form-control" required>
+                        <div class="form-text">Your password must be at least 8 characters long.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="new_password2" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

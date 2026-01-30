@@ -167,12 +167,7 @@ def mark_notifications_read(request):
     return JsonResponse({'status': 'error'}, status=400)
 @login_required(login_url='user')
 def staff_orders(request):
-    if not request.user.is_staff:
-        return redirect('home')
-    
-    # Show orders assigned to this specific staff member
-    assigned_orders = Order.objects.filter(assigned_staff=request.user).order_by('-order_date')
-    return render(request, 'inventory/staff_orders.html', {'orders': assigned_orders})
+    return redirect('profile')
 
 from .payment_gateway import EsewaGateway, KhaltiGateway
 from .models import Payment
@@ -277,7 +272,7 @@ def place_order(request):
                 for admin in admins:
                     Notification.objects.create(
                         user=admin,
-                        message=f"New Order #{new_order.tracking_number} received from {request.user.username}."
+                        message=f"ACTION REQUIRED: Pending Order #{new_order.tracking_number} - Deliver to {new_order.delivery_address}."
                     )
             
             # Transaction Committed Successfully - Proceed to Payment Gateway
@@ -446,16 +441,42 @@ def payment_success(request):
             pass
     return render(request, 'inventory/payment_success.html', {'order': order})
 
+@login_required(login_url='user')
 def update_stock(request, product_id):
+    if not request.user.is_staff:
+        messages.error(request, "Unauthorized access.")
+        return redirect('home')
+
     if request.method == 'POST':
-        product = get_object_or_404(Product, id=product_id, assigned_staff=request.user)
-        action = request.POST.get('action')
-        if action == 'increase':
-            product.stock += 1
-        elif action == 'decrease' and product.stock > 0:
-            product.stock -= 1
-        product.save()
-    return redirect('product_list')
+        product = get_object_or_404(Product, id=product_id) # Allow any staff to update
+        
+        # Check if direct stock update provided
+        new_stock = request.POST.get('stock')
+        if new_stock is not None:
+            try:
+                val = int(new_stock)
+                if val >= 0:
+                    product.stock = val
+                    product.save()
+                    messages.success(request, f"Stock updated for {product.name}.")
+                else:
+                    messages.error(request, "Stock cannot be negative.")
+            except ValueError:
+                messages.error(request, "Invalid stock value.")
+        else:
+            # Fallback to increment/decrement logic if needed
+            action = request.POST.get('action')
+            if action == 'increase':
+                product.stock += 1
+                product.save()
+            elif action == 'decrease' and product.stock > 0:
+                product.stock -= 1
+                product.save()
+            
+    return redirect('/profile/?tab=inventory')
+
+# ... (Previous code) ...
+
 
 def cart(request):
     return render(request, 'inventory/cart.html')
@@ -466,15 +487,7 @@ def checkout(request):
     return render(request, 'inventory/checkout.html')
 
 def product_list(request):
-    query = request.GET.get('q')
-    if request.user.is_staff:
-        products = Product.objects.filter(assigned_staff=request.user)
-        if query:
-            products = Product.objects.filter(name__icontains=query)
-    else:
-        products = Product.objects.none()
-        messages.error(request, "You do not have permission to view this inventory.")
-    return render(request, 'inventory/product_list.html',{'products': products})
+    return redirect('profile')
 
 # Order Tracking Views
 def order_tracking(request):
@@ -540,21 +553,62 @@ def profile(request):
     """User profile page"""
     profile, created = Profile.objects.get_or_create(user=request.user)
     saved_count = SavedItem.objects.filter(user=request.user).count()
-    
+
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        
+        if first_name:
+            request.user.first_name = first_name
+        
+        if email:
+            if email != request.user.email and not User.objects.filter(email=email).exists():
+                request.user.email = email
+                request.user.username = email
+            elif email != request.user.email:
+                messages.error(request, "Email already exists.")
+        
+        request.user.save()
+        
+        if phone:
+            profile.phone_number = phone
+            profile.save()
+            
+        messages.success(request, "Profile updated successfully.")
+        return redirect('profile')
+
     # Check if user is staff (including superuser)
     if request.user.is_staff:
         from django.utils import timezone
         
         # Staff Context
-        assigned_orders = Order.objects.filter(assigned_staff=request.user)
-        assigned_count = assigned_orders.count()
-        recent_tasks = assigned_orders.order_by('-order_date')[:5]
+        # Staff Context - Show Pending Orders
+        all_pending = Order.objects.filter(status='Pending')
+        assigned_count = all_pending.count()
+        
+        # Tasks Handled by this staff (Any status update they made)
+        tasks_handled = OrderStatusHistory.objects.filter(changed_by=request.user).values('order').distinct().count()
+        
+        recent_tasks = all_pending.order_by('-order_date')
+        
+        # Activity Log
+        activities = OrderStatusHistory.objects.filter(changed_by=request.user).select_related('order').order_by('-changed_at')[:20]
+        
+        # Inventory List
+        products = Product.objects.all().order_by('category', 'name')
+        
+        active_tab = request.GET.get('tab', 'dashboard')
         
         context = {
             'profile': profile,
             'assigned_count': assigned_count,
+            'tasks_handled': tasks_handled,
             'recent_tasks': recent_tasks,
-            'today': timezone.now()
+            'activities': activities,
+            'products': products,
+            'today': timezone.now(),
+            'active_tab': active_tab
         }
         return render(request, 'inventory/staff_profile.html', context)
     
@@ -620,6 +674,24 @@ def account_settings(request):
     return render(request, 'inventory/account_settings.html', {
         'saved_count': saved_count
     })
+
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+
+@login_required(login_url='user')
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to keep the user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+            return redirect('/profile/?tab=security')
+    return redirect('profile')
 
 # Content Pages
 def about(request):
@@ -704,25 +776,8 @@ def add_tracking_event(request, tracking_id):
 
 @login_required(login_url='user')
 def staff_dashboard(request):
-    """Staff Dashboard - Operational Overview"""
-    if not request.user.is_staff:
-        messages.error(request, "Restricted access.")
-        return redirect('home')
-    
-    # Get assigned data
-    assigned_orders = Order.objects.filter(assigned_staff=request.user)
-    assigned_products = Product.objects.filter(assigned_staff=request.user)
-    
-    context = {
-        'orders_count': assigned_orders.count(),
-        'products_count': assigned_products.count(),
-        'pending_orders': assigned_orders.filter(status='Pending').count(),
-        'completed_orders': assigned_orders.filter(status='Delivered').count(),
-        'recent_orders': assigned_orders.order_by('-order_date')[:5],
-        'low_stock_products': assigned_products.filter(stock__lte=5)
-    }
-    
-    return render(request, 'inventory/staff_dashboard.html', context)
+    """Staff Dashboard - Operational Overview (Redirect to Profile as Unified Dashboard)"""
+    return redirect('profile')
 
 @login_required(login_url='user')
 def staff_update_order(request, order_id):
@@ -732,10 +787,10 @@ def staff_update_order(request, order_id):
         
     order = get_object_or_404(Order, id=order_id)
     
-    # Safety Check: Staff can only update their assigned orders
-    if order.assigned_staff != request.user and not request.user.is_superuser:
-        messages.error(request, "This task is not assigned to you.")
-        return redirect('staff_orders')
+    # Safety Check: Allow any staff to update for now to enable "Pick Up" workflow
+    # if order.assigned_staff != request.user and not request.user.is_superuser:
+    #     messages.error(request, "This task is not assigned to you.")
+    #     return redirect('profile')
         
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -744,6 +799,11 @@ def staff_update_order(request, order_id):
         if new_status in dict(Order.STATUS_CHOICES):
             old_status = order.status
             order.status = new_status
+            
+            # Auto-assign if not assigned
+            if not order.assigned_staff:
+                order.assigned_staff = request.user
+            
             order.save()
             
             # Audit Trail
@@ -759,7 +819,7 @@ def staff_update_order(request, order_id):
         else:
             messages.error(request, "Invalid status selection.")
             
-    return redirect('staff_orders')
+    return redirect('/profile/?tab=tasks')
 
 # Admin Dashboard View (Superuser Only)
 @login_required(login_url='user')

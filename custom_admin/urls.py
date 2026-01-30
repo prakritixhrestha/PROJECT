@@ -32,6 +32,8 @@ urlpatterns = [
     # 4. Users
     path('users/', views.UserListView.as_view(), name='users-list'),
     path('users/add/', views.UserCreateView.as_view(), name='users-add'),
+    path('users/<int:pk>/edit/', views.UserUpdateView.as_view(), name='users-edit'),
+    path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='users-delete'),
     path('users/<int:pk>/staff-toggle/', views.toggle_staff_status, name='users-staff-toggle'),
     
     # 5. Payments

@@ -130,7 +130,7 @@
         <div style="height: 250px; position: relative;">
             <canvas id="activityChart"></canvas>
             <div style="position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                <div style="font-size: 26px; font-weight: 800; color: var(--text-main);">85%</div>
+                <div style="font-size: 26px; font-weight: 800; color: var(--text-main);">{{ success_rate }}%</div>
                 <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Success</div>
             </div>
         </div>
@@ -218,7 +218,7 @@
         data: {
             labels: ['Completed', 'Pending', 'Cancelled'],
             datasets: [{
-                data: [65, 25, 10], 
+                data: [{{ completed_count }}, {{ pending_count }}, {{ cancelled_count }}], 
                 backgroundColor: ['#3498db', '#f1c40f', '#e74c3c'],
                 borderWidth: 0,
                 hoverOffset: 10
