@@ -247,8 +247,6 @@
                 <div class="sidebar-section-title">How you use FurniQ</div>
                 <ul class="sidebar-menu">
                     <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> My Cart</a></li>
-                    <li><a href="{% url 'saved_items' %}" class="active"><i class="fas fa-heart"></i> Saved <span
-                                class="badge">{{ saved_count }}</span></a></li>
                     <li><a href="{% url 'order_history' %}"><i class="fas fa-receipt"></i> Orders and payments</a></li>
                 </ul>
             </div>
@@ -264,7 +262,6 @@
                 <div class="sidebar-section-title">Support & Info</div>
                 <ul class="sidebar-menu">
                     <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></li>
-                    <li><a href="{% url 'help_center' %}"><i class="fas fa-question-circle"></i> Help Center</a></li>
                 </ul>
             </div>
             <div class="sidebar-section" style="border-bottom: none;">

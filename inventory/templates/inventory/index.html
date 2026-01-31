@@ -129,6 +129,9 @@
                         </span>
                         {% endif %}
                     </div>
+                    {% if product.stock <= 0 %}
+                    <div class="text-danger fw-bold mt-1" style="font-family:'Italiana',serif; font-size: 14px;">Out of Stock</div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@
         {% csrf_token %}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             {% for field in form %}
-            <div style="{% if field.name == 'description' %}grid-column: span 2;{% endif %} margin-bottom: 10px;">
+            <div class="{% if field.name == 'description' %}full-width{% endif %}" style="margin-bottom: 10px;">
                 <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">{{ field.label }}</label>
                 
                 {% if field.field.widget.input_type == 'checkbox' %}
@@ -60,6 +60,9 @@
     input:focus, select:focus, textarea:focus {
         outline: none !important;
         border-color: var(--accent-primary) !important;
+    }
+    .full-width {
+        grid-column: span 2;
     }
 </style>
 {% endblock %}

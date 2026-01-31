@@ -1,6 +1,30 @@
 {% extends 'custom_admin/base_admin_custom.html' %}
 {% block title %}System Notifications{% endblock %}
 {% block page_title %}Alerts & Notifications{% endblock %}
+{% block extra_head %}
+<style>
+    .notification-card {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(75, 46, 30, 0.04);
+        margin-bottom: 5px;
+        transition: all 0.2s ease;
+    }
+    .notification-unread {
+        border-left: 4px solid #3498db;
+        background: #fcfdfd;
+    }
+    .notification-read {
+        border-left: 4px solid #eee;
+        background: white;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
     <h2 style="font-size: 24px; font-weight: 700;">System Alerts</h2>
@@ -11,7 +35,7 @@
 
 <div style="display: flex; flex-direction: column; gap: 15px;">
     {% for n in notifications %}
-    <div class="data-card" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid {% if n.is_read %}#eee{% else %}#3498db{% endif %}; background: {% if n.is_read %}white{% else %}#fcfdfd{% endif %};">
+    <div class="notification-card {% if n.is_read %}notification-read{% else %}notification-unread{% endif %}">
         <div style="flex: 1;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                 <span style="font-weight: 700; font-size: 14px; color: var(--text-main);">{{ n.user.get_full_name|default:n.user.username }}</span>

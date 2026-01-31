@@ -24,9 +24,16 @@
                     <p class="fw-bold" style="font-size: 1.1rem; color: #4b2e1e; margin-bottom: 20px;">Rs {{ product.price }}</p>
                     
                     <div class="mt-auto">
+                        {% if product.stock > 0 %}
                         <button class="btn btn-brown w-100" style="border-radius: 25px; padding: 10px;" onclick="addToCart('{{ product.name|escapejs }}')">
                             Add to Cart
                         </button>
+                        {% else %}
+                        <div class="text-danger fw-bold mb-2" style="font-family:'Italiana',serif;">Out of Stock</div>
+                        <button class="btn btn-secondary w-100" disabled style="border-radius: 25px; padding: 10px; background-color: #6c757d;">
+                            Sold Out
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>

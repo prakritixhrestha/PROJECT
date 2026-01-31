@@ -148,7 +148,7 @@
 </div>
 
 <script>
-    const PRODUCT_PRICES = {
+    const PRODUCT_PRICES = {% if product_prices_json %}{{ product_prices_json|safe }}{% else %}{
         "Floralshell Chair": 9000,
         "Fuzzy sofa": 10000,
         "Coffee Table Marble": 90000,
@@ -166,8 +166,10 @@
         "Oval Ceramic Dining Table": 150000,
         "POVISON Modern Dining Table": 140000,
         "Round Marble Dining Set": 100000,
-        "Curved wooden with Cushion dining": 80000
-    };
+        "Curved wooden with Cushion dining": 80000,
+        "Royal Bed": 8000,
+        "Roundhead Sofa": 68000
+    }{% endif %};
 
     function renderCart() {
         const savedData = localStorage.getItem('cart');
@@ -182,7 +184,7 @@
         let totalAmount = 0;
         let html = `<div class="container" style="max-width:700px; font-family: Italiana, serif;">`;
         html += `<table class="table text-start shadow-sm">`;
-        html += `<thead class="table-light"><tr><th>Product</th><th>Quantity</th><th colspan = 2>Action</th></tr></thead><tbody>`;
+        html += `<thead class="table-light"><tr><th>Product</th><th>Price</th><th>Quantity</th><th>Action</th></tr></thead><tbody>`;
 
         Object.entries(cart).forEach(([name, qty]) => {
             const price = PRODUCT_PRICES[name] || 0;
@@ -191,7 +193,7 @@
 
             html += `<tr>
                 <td class="align-middle">${name}</td>
-                <td class="align-middle">Rs.${price}</td> 
+                <td class="align-middle">Rs ${price.toLocaleString()}</td> 
                 <td class="align-middle">${qty}</td>
                 <td class="text-center">
                     <button class="btn btn-sm btn-remove-custom" style="background-color: #7c5a43; color: white; border: none; padding: 5px 15px;" onclick="removeFromCart('${name}')">Remove</button>

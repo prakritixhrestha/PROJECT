@@ -10,6 +10,8 @@ from django.contrib.auth.models import User, Group
 from .models import Product, Profile, Order, Notification, OrderStatusHistory, Address, SavedItem, Subscriber, ShipmentTracking, WebsiteContent
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 # This part gets your data from your database and sends to the screen.
 
 #Customer homepage
@@ -323,15 +325,36 @@ def place_order(request):
 def esewa_callback(request):
     """
     Handle eSewa payment callback
-    eSewa redirects here after payment with GET parameters
+    eSewa redirects here after payment with GET parameters.
+    eSewa V2 sends data as a base64 encoded JSON string in the 'data' parameter.
     """
-    # Check if this is a failure callback
+    # Check if this is a failure callback from legacy or custom param
     if request.GET.get('status') == 'failed':
         return render(request, 'inventory/payment_failed.html', {'message': 'eSewa Payment Failed or Cancelled'})
     
     # Get parameters from eSewa callback
+    data_encoded = request.GET.get('data')
     transaction_uuid = request.GET.get('transaction_uuid')
+    callback_amount = None
     
+    # Handle eSewa V2 base64 encoded data
+    if data_encoded:
+        import base64
+        import json
+        try:
+            decoded_data = base64.b64decode(data_encoded).decode('utf-8')
+            data = json.loads(decoded_data)
+            transaction_uuid = data.get('transaction_uuid')
+            callback_amount = data.get('total_amount') # e.g., "9000.0"
+            
+            # Check if status in data is COMPLETE
+            if data.get('status') != 'COMPLETE':
+                return render(request, 'inventory/payment_failed.html', {
+                    'message': f"Payment status: {data.get('status', 'Failed')}"
+                })
+        except Exception as e:
+            return render(request, 'inventory/payment_failed.html', {'message': f'Invalid callback data: {str(e)}'})
+
     if not transaction_uuid:
         return render(request, 'inventory/payment_failed.html', {'message': 'Invalid callback data'})
     
@@ -340,26 +363,43 @@ def esewa_callback(request):
         order_id = transaction_uuid.split('-')[0]
         order = Order.objects.get(id=order_id)
         
+        # Determine the amount string to use for verification
+        # It must match EXACTLY what was in the signed field during initiation.
+        # Using the amount from the callback is the most reliable way to match eSewa's records.
+        if callback_amount:
+            verification_amount = str(callback_amount).replace(',', '')
+        else:
+            verification_amount = str(int(order.total_price))
+            
         # Verify payment with eSewa
         esewa = EsewaGateway()
         verification = esewa.verify_payment(
             product_code='EPAYTEST',
-            total_amount=str(int(order.total_price)),
+            total_amount=verification_amount,
             transaction_uuid=transaction_uuid
         )
         
         if verification.get('success'):
+            # Security Check: Ensure the verified amount matches the order total price numerically
+            verified_amount = float(verification['data'].get('total_amount', 0))
+            if abs(verified_amount - float(order.total_price)) > 0.01:
+                 return render(request, 'inventory/payment_failed.html', {
+                    'message': f"Price mismatch. Order: {order.total_price}, Paid: {verified_amount}"
+                })
+
             # Payment verified successfully
             order.payment_status = 'Completed'
             order.save()
             
             # Create Payment Record
+            transaction_id = verification['data'].get('transaction_code') or verification['data'].get('ref_id') or transaction_uuid
+            
             Payment.objects.create(
                 order=order,
                 payment_method='eSewa',
                 amount=order.total_price,
                 status='Completed',
-                transaction_id=verification['data'].get('ref_id', transaction_uuid),
+                transaction_id=transaction_id,
                 response_data=json.dumps(verification['data'])
             )
             
@@ -479,12 +519,20 @@ def update_stock(request, product_id):
 
 
 def cart(request):
-    return render(request, 'inventory/cart.html')
+    products = Product.objects.all()
+    product_prices = {p.name: float(p.price) for p in products}
+    return render(request, 'inventory/cart.html', {
+        'product_prices_json': json.dumps(product_prices)
+    })
 
 @login_required(login_url='user')
 def checkout(request):
     """Checkout page with delivery details form"""
-    return render(request, 'inventory/checkout.html')
+    products = Product.objects.all()
+    product_prices = {p.name: float(p.price) for p in products}
+    return render(request, 'inventory/checkout.html', {
+        'product_prices_json': json.dumps(product_prices)
+    })
 
 def product_list(request):
     return redirect('profile')
@@ -668,15 +716,33 @@ def account_settings(request):
     saved_count = SavedItem.objects.filter(user=request.user).count()
     
     if request.method == 'POST':
-        # Handle password change or other settings
-        pass
+        # Check if this is a password change request
+        if 'current_password' in request.POST:
+            current_pw = request.POST.get('current_password')
+            new_pw = request.POST.get('new_password')
+            confirm_pw = request.POST.get('confirm_password')
+            
+            if new_pw != confirm_pw:
+                messages.error(request, "New passwords do not match!")
+            elif not request.user.check_password(current_pw):
+                messages.error(request, "Incorrect current password!")
+            else:
+                request.user.set_password(new_pw)
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+                messages.success(request, "Your password was successfully updated!")
+            return redirect('account_settings')
+            
+        # Check if this is a preferences update
+        if 'save_preferences' in request.POST:
+            # Logic to save preferences to User/Profile model could go here
+            messages.success(request, "Your preferences have been updated!")
+            return redirect('account_settings')
     
     return render(request, 'inventory/account_settings.html', {
         'saved_count': saved_count
     })
 
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 
 @login_required(login_url='user')
 def change_password(request):

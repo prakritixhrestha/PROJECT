@@ -315,7 +315,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const PRODUCT_PRICES = {
+        const PRODUCT_PRICES = {% if product_prices_json %}{{ product_prices_json|safe }}{% else %}{
             "Floralshell Chair": 9000,
             "Fuzzy sofa": 10000,
             "Coffee Table Marble": 90000,
@@ -334,7 +334,7 @@
             "POVISON Modern Dining Table": 140000,
             "Round Marble Dining Set": 100000,
             "Curved wooden with Cushion dining": 80000
-        };
+        }{% endif %};
 
         // Set minimum date to tomorrow
         const tomorrow = new Date();

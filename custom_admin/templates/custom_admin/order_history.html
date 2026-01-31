@@ -1,6 +1,21 @@
 {% extends 'custom_admin/base_admin_custom.html' %}
 {% block title %}Order History{% endblock %}
 {% block page_title %}Order Status Logs{% endblock %}
+{% block extra_head %}
+<style>
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-delivered { background: #e8f5e9; color: #2e7d32; }
+    .status-pending { background: #fff8e1; color: #f57f17; }
+    .status-other { background: #f1f3f4; color: #5f6368; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="data-card">
     <table>
@@ -11,10 +26,7 @@
                 <td><span style="font-weight: 700; color: var(--text-main);">#{{ entry.order.id }}</span></td>
                 <td><span style="color: var(--text-muted);">{{ entry.old_status }}</span></td>
                 <td>
-                    <span class="badge" style="
-                    {% if entry.new_status == 'Delivered' %}background: #e8f5e9; color: #2e7d32;
-                    {% elif entry.new_status == 'Pending' or entry.new_status == 'Processing' %}background: #fff8e1; color: #f57f17;
-                    {% else %}background: #f1f3f4; color: #5f6368;{% endif %}">
+                    <span class="status-badge {% if entry.new_status == 'Delivered' %}status-delivered{% elif entry.new_status == 'Pending' or entry.new_status == 'Processing' %}status-pending{% else %}status-other{% endif %}">
                         {{ entry.new_status|upper }}
                     </span>
                 </td>

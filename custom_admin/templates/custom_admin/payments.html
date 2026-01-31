@@ -2,6 +2,21 @@
 
 {% block title %}Payments Tracker{% endblock %}
 
+{% block extra_head %}
+<style>
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-completed { background: #e8f5e9; color: #2e7d32; }
+    .status-failed { background: #fce8e6; color: #c62828; }
+    .status-pending { background: #fff8e1; color: #f57f17; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
     <h2 style="font-size: 24px; font-weight: 700;">Payments & Revenue</h2>
@@ -45,10 +60,7 @@
                 </td>
                 <td style="font-weight: 800; color: var(--text-main);">Rs {{ order.total_price }}</td>
                 <td>
-                    <span class="badge" style="
-                    {% if order.payment_status == 'Completed' %}background: #e8f5e9; color: #2e7d32;
-                    {% elif order.payment_status == 'Failed' %}background: #fce8e6; color: #c62828;
-                    {% else %}background: #fff8e1; color: #f57f17;{% endif %}">
+                    <span class="status-badge {% if order.payment_status == 'Completed' %}status-completed{% elif order.payment_status == 'Failed' %}status-failed{% else %}status-pending{% endif %}">
                         {{ order.payment_status|upper }}
                     </span>
                 </td>

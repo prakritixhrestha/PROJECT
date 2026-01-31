@@ -55,6 +55,18 @@
         box-shadow: 0 4px 15px rgba(75, 46, 30, 0.04);
     }
 
+    /* STATUS BADGES */
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-delivered { background: #e8f5e9; color: #2e7d32; }
+    .status-pending { background: #fff8e1; color: #f57f17; }
+    .status-other { background: #f1f3f4; color: #5f6368; }
+
     @keyframes slideUp { 
         from { transform: translateY(20px); opacity:0; } 
         to { transform: translateY(0); opacity:1; } 
@@ -165,11 +177,8 @@
                 </td>
                 <td style="color: var(--text-muted);">{{ order.order_date|date:"M d, Y" }}</td>
                 <td>
-                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; 
-                    {% if order.status == 'Delivered' %}background: #e8f5e9; color: #2e7d32;
-                    {% elif order.status == 'Pending' %}background: #fff8e1; color: #f57f17;
-                    {% else %}background: #f1f3f4; color: #5f6368;{% endif %}">
-                        {{ order.status|upper }}
+                    <span class="status-badge {% if order.status == 'Delivered' %}status-delivered{% elif order.status == 'Pending' %}status-pending{% else %}status-other{% endif %}">
+                        {{ order.status }}
                     </span>
                 </td>
                 <td style="text-align: right; font-weight: 800; color: var(--text-main);">Rs {{ order.total_price }}</td>
@@ -179,7 +188,20 @@
     </table>
 </div>
 
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_sales|json_script:"chart-sales-data" }}
+{{ completed_count|json_script:"completed-count-data" }}
+{{ pending_count|json_script:"pending-count-data" }}
+{{ cancelled_count|json_script:"cancelled-count-data" }}
+
 <script>
+    // Data passed safely from Django
+    const chartLabels = JSON.parse(document.getElementById('chart-labels-data').textContent);
+    const chartSales = JSON.parse(document.getElementById('chart-sales-data').textContent);
+    const completedCount = JSON.parse(document.getElementById('completed-count-data').textContent);
+    const pendingCount = JSON.parse(document.getElementById('pending-count-data').textContent);
+    const cancelledCount = JSON.parse(document.getElementById('cancelled-count-data').textContent);
+
     // Chart.js Configuration
     const ctxRev = document.getElementById('revenueChart').getContext('2d');
     
@@ -187,10 +209,10 @@
     new Chart(ctxRev, {
         type: 'line',
         data: {
-            labels: {{ chart_labels|safe }},
+            labels: chartLabels,
             datasets: [{
                 label: 'Revenue',
-                data: {{ chart_sales|safe }},
+                data: chartSales,
                 borderColor: '#2ecc71',
                 backgroundColor: 'rgba(46, 204, 113, 0.05)',
                 borderWidth: 3,
@@ -218,7 +240,7 @@
         data: {
             labels: ['Completed', 'Pending', 'Cancelled'],
             datasets: [{
-                data: [{{ completed_count }}, {{ pending_count }}, {{ cancelled_count }}], 
+                data: [completedCount, pendingCount, cancelledCount], 
                 backgroundColor: ['#3498db', '#f1c40f', '#e74c3c'],
                 borderWidth: 0,
                 hoverOffset: 10
@@ -234,8 +256,8 @@
 
     // REVENUE REPORT LOGIC
     function openRevenueReport() {
-        const labels = {{ chart_labels|safe }};
-        const values = {{ chart_sales|safe }};
+        const labels = chartLabels;
+        const values = chartSales;
         const total = values.reduce((a, b) => a + b, 0);
         
         let tableRows = '';

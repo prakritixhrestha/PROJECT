@@ -210,8 +210,6 @@
                 <div class="sidebar-section-title">How you use FurniQ</div>
                 <ul class="sidebar-menu">
                     <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> My Cart</a></li>
-                    <li><a href="{% url 'saved_items' %}"><i class="fas fa-heart"></i> Saved <span class="badge">{{
-                                saved_count }}</span></a></li>
                     <li><a href="{% url 'order_history' %}"><i class="fas fa-receipt"></i> Orders and payments</a></li>
                 </ul>
             </div>
@@ -228,7 +226,6 @@
                 <div class="sidebar-section-title">Support & Info</div>
                 <ul class="sidebar-menu">
                     <li><a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> About</a></li>
-                    <li><a href="{% url 'help_center' %}"><i class="fas fa-question-circle"></i> Help Center</a></li>
                 </ul>
             </div>
             <div class="sidebar-section" style="border-bottom: none;">
@@ -241,6 +238,17 @@
 
         <!-- Main Content -->
         <div class="main-content">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
             <h1 class="page-title">Account Privacy & Settings</h1>
 
             <div class="settings-section">
@@ -265,25 +273,28 @@
 
             <div class="settings-section">
                 <h3 class="section-title">Email Preferences</h3>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="orderUpdates" checked>
-                    <label class="form-check-label" for="orderUpdates">
-                        Receive order updates via email
-                    </label>
-                </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="promotions" checked>
-                    <label class="form-check-label" for="promotions">
-                        Receive promotional emails
-                    </label>
-                </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="newsletter">
-                    <label class="form-check-label" for="newsletter">
-                        Subscribe to newsletter
-                    </label>
-                </div>
-                <button class="btn-save">Save Preferences</button>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="order_updates" id="orderUpdates" checked>
+                        <label class="form-check-label" for="orderUpdates">
+                            Receive order updates via email
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="promotions" id="promotions" checked>
+                        <label class="form-check-label" for="promotions">
+                            Receive promotional emails
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter">
+                        <label class="form-check-label" for="newsletter">
+                            Subscribe to newsletter
+                        </label>
+                    </div>
+                    <button type="submit" name="save_preferences" class="btn-save">Save Preferences</button>
+                </form>
             </div>
 
             <div class="settings-section" style="border-bottom: none;">
