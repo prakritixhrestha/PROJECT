@@ -141,6 +141,7 @@ class OrderUpdateView(AdminMixin, UpdateView):
         old_order = Order.objects.get(pk=self.object.pk)
         new_status = form.cleaned_data['status']
         new_payment_status = form.cleaned_data['payment_status']
+        new_assigned_staff = form.cleaned_data['assigned_staff']
         
         if old_order.status != new_status:
             OrderStatusHistory.objects.create(
@@ -154,6 +155,13 @@ class OrderUpdateView(AdminMixin, UpdateView):
             Notification.objects.create(
                 user=self.object.customer,
                 message=f"Your Order #{self.object.tracking_number} status has been updated to: {new_status}."
+            )
+
+        # Notify newly assigned staff
+        if old_order.assigned_staff != new_assigned_staff and new_assigned_staff:
+            Notification.objects.create(
+                user=new_assigned_staff,
+                message=f"You have been assigned to handle Order #{self.object.tracking_number} for delivery to {self.object.delivery_address}."
             )
 
         # Sync Payment Model if payment status updated to Completed

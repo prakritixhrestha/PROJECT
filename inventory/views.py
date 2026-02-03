@@ -869,6 +869,12 @@ def staff_update_order(request, order_id):
             # Auto-assign if not assigned
             if not order.assigned_staff:
                 order.assigned_staff = request.user
+                
+                # Notify the staff member (Self-confirmation)
+                Notification.objects.create(
+                    user=request.user,
+                    message=f"You have been assigned to handle Order #{order.tracking_number} for delivery to {order.delivery_address}."
+                )
             
             order.save()
             

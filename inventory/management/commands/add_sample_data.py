@@ -79,7 +79,7 @@ class Command(BaseCommand):
                         'payment_method': 'eSewa',
                         'payment_status': 'Completed',
                         'delivery_address': 'Pokhara, Nepal',
-                        'delivery_phone': '9811111111'
+                        'delivery_phone': '+9779811111111'
                     },
                 ]
                 
