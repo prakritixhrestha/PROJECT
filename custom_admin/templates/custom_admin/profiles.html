@@ -58,7 +58,7 @@
                         {% else %}
                             <a href="{% url 'admin-custom:profiles-reject' profile.pk %}" class="badge" style="background: #eee; color: var(--text-muted); text-decoration: none;">REJECT</a>
                         {% endif %}
-                        <a href="#" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
+                        <a href="{% url 'admin-custom:profiles-delete' profile.pk %}" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
                     </div>
                 </td>
             </tr>

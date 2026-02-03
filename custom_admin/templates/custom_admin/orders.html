@@ -14,6 +14,23 @@
     .status-delivered { background: #e8f5e9; color: #2e7d32; }
     .status-pending { background: #fff8e1; color: #f57f17; }
     .status-other { background: #f1f3f4; color: #5f6368; }
+
+    .metric-card-link {
+        text-decoration: none;
+        display: block;
+        height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .metric-card-link:hover {
+        transform: translateY(-8px);
+    }
+    .metric-card-link:hover .stat-card {
+        box-shadow: 0 12px 30px rgba(75, 46, 30, 0.12);
+        filter: brightness(1.02);
+    }
+    .metric-card-link:active {
+        transform: translateY(-2px);
+    }
 </style>
 {% endblock %}
 
@@ -25,16 +42,27 @@
 
 <!-- TOP METRICS -->
 <div class="stats-grid">
-    <div class="stat-card" style="border-bottom-color: var(--info);">
-        <div class="stat-icon" style="background: #eaf2f8; color: var(--info);"><i class="fas fa-shopping-cart"></i></div>
-        <div class="label">Total Orders</div>
-        <div class="value">{{ total_count }}</div>
-    </div>
-    <div class="stat-card" style="border-bottom-color: var(--warning);">
-        <div class="stat-icon" style="background: #fff8e1; color: var(--warning);"><i class="fas fa-clock"></i></div>
-        <div class="label">Pending Orders</div>
-        <div class="value">{{ new_orders }}</div>
-    </div>
+    <a href="{% url 'admin-custom:orders-list' %}" class="metric-card-link">
+        <div class="stat-card" style="border-bottom-color: var(--info); height: 100%;">
+            <div class="stat-icon" style="background: #eaf2f8; color: var(--info);"><i class="fas fa-shopping-cart"></i></div>
+            <div class="label">Total Orders</div>
+            <div class="value">{{ total_count }}</div>
+        </div>
+    </a>
+    <a href="{% url 'admin-custom:orders-list' %}" class="metric-card-link">
+        <div class="stat-card" style="border-bottom-color: var(--warning); height: 100%;">
+            <div class="stat-icon" style="background: #fff8e1; color: var(--warning);"><i class="fas fa-clock"></i></div>
+            <div class="label">Pending Orders</div>
+            <div class="value">{{ new_orders }}</div>
+        </div>
+    </a>
+    <a href="{% url 'admin-custom:orders-list' %}?unassigned=1" class="metric-card-link">
+        <div class="stat-card" style="border-bottom-color: #ff9800; height: 100%;">
+            <div class="stat-icon" style="background: #fff3e0; color: #ff9800;"><i class="fas fa-user-plus"></i></div>
+            <div class="label">Assign Staff</div>
+            <div class="value">{{ unassigned_orders }}</div>
+        </div>
+    </a>
 </div>
 
 <div class="data-container">
@@ -46,6 +74,7 @@
                 <th>DELIVERY TO</th>
                 <th>SUMMARY</th>
                 <th>TOTAL</th>
+                <th>ASSIGNED STAFF</th>
                 <th>STATUS</th>
                 <th style="text-align: right;">ACTIONS</th>
             </tr>
@@ -66,6 +95,14 @@
                 </td>
                 <td style="color: var(--text-muted); font-size: 13px;">{{ order.items_summary|truncatechars:40 }}</td>
                 <td style="font-weight: 800;">Rs {{ order.total_price }}</td>
+                <td>
+                    {% if order.assigned_staff %}
+                        <div style="font-weight: 600; color: var(--text-main);">{{ order.assigned_staff.get_full_name|default:order.assigned_staff.username }}</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">@{{ order.assigned_staff.username }}</div>
+                    {% else %}
+                        <span class="badge" style="background: #fdeded; color: #e74c3c; font-size: 9px;">UNASSIGNED</span>
+                    {% endif %}
+                </td>
                 <td>
                     <span class="status-badge {% if order.status == 'Delivered' %}status-delivered{% elif order.status == 'Pending' or order.status == 'Processing' %}status-pending{% else %}status-other{% endif %}">
                         {{ order.status|upper }}

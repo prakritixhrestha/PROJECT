@@ -22,12 +22,14 @@ urlpatterns = [
     path('products/', views.ProductListView.as_view(), name='products-list'),
     path('products/add/', views.ProductCreateView.as_view(), name='products-add'),
     path('products/<int:pk>/edit/', views.ProductUpdateView.as_view(), name='products-edit'),
+    path('products/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='products-delete'),
     path('products/<int:pk>/toggle/', views.toggle_product_active, name='products-toggle'),
     
     # 3. Profiles
     path('profiles/', views.ProfileListView.as_view(), name='profiles-list'),
     path('profiles/<int:pk>/approve/', views.approve_profile, name='profiles-approve'),
     path('profiles/<int:pk>/reject/', views.reject_profile, name='profiles-reject'),
+    path('profiles/<int:pk>/delete/', views.ProfileDeleteView.as_view(), name='profiles-delete'),
     
     # 4. Users
     path('users/', views.UserListView.as_view(), name='users-list'),
@@ -53,6 +55,7 @@ urlpatterns = [
     
     # 9. Address
     path('addresses/', views.AddressListView.as_view(), name='addresses-list'),
+    path('addresses/<int:pk>/delete/', views.AddressDeleteView.as_view(), name='addresses-delete'),
     
     # 10. Website Settings
     path('website-settings/', views.website_settings, name='website-settings'),

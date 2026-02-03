@@ -121,17 +121,30 @@ class OrderListView(AdminMixin, ListView):
     model = Order
     template_name = 'custom_admin/orders.html'
     context_object_name = 'orders'
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.GET.get('unassigned') == '1':
+            qs = qs.filter(assigned_staff__isnull=True)
+        return qs.order_by('-order_date')
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['total_count'] = Order.objects.count()
         ctx['new_orders'] = Order.objects.filter(status='Pending').count()
+        ctx['unassigned_orders'] = Order.objects.filter(assigned_staff__isnull=True).count()
         return ctx
 
 class OrderUpdateView(AdminMixin, UpdateView):
     model = Order
-    fields = ['status', 'payment_status']
+    fields = ['status', 'payment_status', 'assigned_staff']
     template_name = 'custom_admin/order_form.html'
     success_url = reverse_lazy('admin-custom:orders-list')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['staff_users'] = User.objects.filter(is_staff=True)
+        return ctx
 
     def form_valid(self, form):
         # Record history if status changed
@@ -261,6 +274,11 @@ def toggle_product_active(request, pk):
     p.save()
     return redirect('admin-custom:products-list')
 
+class ProductDeleteView(AdminMixin, DeleteView):
+    model = Product
+    template_name = 'custom_admin/product_confirm_delete.html'
+    success_url = reverse_lazy('admin-custom:products-list')
+
 # 3. Profiles
 class ProfileListView(AdminMixin, ListView):
     model = Profile
@@ -297,6 +315,11 @@ def reject_profile(request, pk):
     p.save()
     messages.warning(request, f'Profile for {p.user.username} rejected')
     return redirect('admin-custom:profiles-list')
+
+class ProfileDeleteView(AdminMixin, DeleteView):
+    model = Profile
+    template_name = 'custom_admin/profile_confirm_delete.html'
+    success_url = reverse_lazy('admin-custom:profiles-list')
 
 # 4. Users
 class UserListView(AdminMixin, ListView):
@@ -392,6 +415,11 @@ class AddressListView(AdminMixin, ListView):
     model = Address
     template_name = 'custom_admin/addresses.html'
     context_object_name = 'addresses'
+
+class AddressDeleteView(AdminMixin, DeleteView):
+    model = Address
+    template_name = 'custom_admin/address_confirm_delete.html'
+    success_url = reverse_lazy('admin-custom:addresses-list')
 
 # 10. Website Content Settings
 @login_required

@@ -72,7 +72,7 @@
                 <td style="text-align: right;">
                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
                         <a href="{% url 'admin-custom:products-edit' product.pk %}" style="color: var(--text-muted);"><i class="fas fa-edit"></i></a>
-                        <a href="#" style="color: #e74c3c;"><i class="fas fa-trash"></i></a>
+                        <a href="{% url 'admin-custom:products-delete' product.pk %}" style="color: #e74c3c;"><i class="fas fa-trash"></i></a>
                     </div>
                 </td>
             </tr>

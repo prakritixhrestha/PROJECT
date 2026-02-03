@@ -1,0 +1,21 @@
+{% extends 'custom_admin/base_admin_custom.html' %}
+
+{% block title %}Delete Product{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center;">
+    <div style="font-size: 60px; color: #e74c3c; margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <h2 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 15px;">Are you sure?</h2>
+    <p style="color: #666; font-size: 16px; margin-bottom: 30px;">
+        Do you really want to delete product <strong>{{ object.name }}</strong>? This action cannot be undone.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <a href="{% url 'admin-custom:products-list' %}" class="btn-unified" style="background: #f8f9fa; color: #333; border: 1px solid #ddd; margin-right: 10px;">Cancel</a>
+        <button type="submit" class="btn-unified" style="background: #e74c3c; color: white;">Delete Product</button>
+    </form>
+</div>
+{% endblock %}

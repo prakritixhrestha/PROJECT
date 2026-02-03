@@ -39,7 +39,7 @@
                 </td>
                 <td style="text-align: right;">
                     <a href="#" style="color: var(--text-muted);"><i class="fas fa-edit"></i></a>
-                    <a href="#" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
+                    <a href="{% url 'admin-custom:addresses-delete' addr.pk %}" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
                 </td>
             </tr>
             {% empty %}

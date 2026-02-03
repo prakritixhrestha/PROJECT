@@ -30,6 +30,19 @@
             </select>
         </div>
 
+        <div style="margin-bottom: 30px;">
+            <label style="display:block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Assigned Staff</label>
+            <select name="assigned_staff" style="width: 100%; padding: 12px; border: 1px solid #f0f0f0; border-radius: 10px; font-family: inherit;">
+                <option value="">---------</option>
+                {% for staff in staff_users %}
+                    <option value="{{ staff.id }}" {% if object.assigned_staff_id == staff.id %}selected{% endif %}>
+                        {{ staff.get_full_name|default:staff.username }} (@{{ staff.username }})
+                    </option>
+                {% endfor %}
+            </select>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">Select a staff member to process this order.</p>
+        </div>
+
         <div style="display: flex; gap: 15px;">
             <button type="submit" class="btn-unified" style="border: none; cursor: pointer; flex: 1;">Update Order</button>
             <a href="{% url 'admin-custom:orders-list' %}" class="btn-unified" style="background: #eee; color: #666; border: none; text-align: center; flex: 1; text-decoration: none;">Cancel</a>
