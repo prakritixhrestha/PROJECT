@@ -149,7 +149,7 @@
         <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; font-size: 10px; font-weight: 800; text-transform: uppercase;">
             <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #3498db;"></span> Completed</div>
             <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #f1c40f;"></span> Pending</div>
-            <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #e74c3c;"></span> Cancelled</div>
+            <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #e74c3c;"></span> Delayed</div>
         </div>
     </div>
 </div>
@@ -192,7 +192,7 @@
 {{ chart_sales|json_script:"chart-sales-data" }}
 {{ completed_count|json_script:"completed-count-data" }}
 {{ pending_count|json_script:"pending-count-data" }}
-{{ cancelled_count|json_script:"cancelled-count-data" }}
+{{ delayed_count|json_script:"delayed-count-data" }}
 
 <script>
     // Data passed safely from Django
@@ -200,7 +200,7 @@
     const chartSales = JSON.parse(document.getElementById('chart-sales-data').textContent);
     const completedCount = JSON.parse(document.getElementById('completed-count-data').textContent);
     const pendingCount = JSON.parse(document.getElementById('pending-count-data').textContent);
-    const cancelledCount = JSON.parse(document.getElementById('cancelled-count-data').textContent);
+    const delayedCount = JSON.parse(document.getElementById('delayed-count-data').textContent);
 
     // Chart.js Configuration
     const ctxRev = document.getElementById('revenueChart').getContext('2d');
@@ -238,9 +238,9 @@
     new Chart(ctxAct, {
         type: 'doughnut',
         data: {
-            labels: ['Completed', 'Pending', 'Cancelled'],
+            labels: ['Completed', 'Pending', 'Delayed'],
             datasets: [{
-                data: [completedCount, pendingCount, cancelledCount], 
+                data: [completedCount, pendingCount, delayedCount], 
                 backgroundColor: ['#3498db', '#f1c40f', '#e74c3c'],
                 borderWidth: 0,
                 hoverOffset: 10

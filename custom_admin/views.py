@@ -13,17 +13,13 @@ from inventory.models import Product, Profile, Order, Notification, Payment, Ord
 
 # Access Decorators
 def is_admin(user):
-    return user.is_authenticated and user.is_staff
+    return user.is_authenticated and user.username == 'furniquette'
 
 class AdminMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        # Admin is staff + (is_superuser or is_approved)
+        # Strictly only allow 'furniquette' user
         u = self.request.user
-        if not u.is_authenticated or not u.is_staff:
-            return False
-        if u.is_superuser:
-            return True
-        return hasattr(u, 'profile') and u.profile.is_approved
+        return u.is_authenticated and u.username == 'furniquette'
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -32,18 +28,12 @@ class AdminMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 # 0. Auth & Dashboard
 def admin_login(request):
-    if request.user.is_authenticated and request.user.is_staff:
+    if request.user.is_authenticated and request.user.username == 'furniquette':
         return redirect('admin-custom:dashboard')
     if request.method == 'POST':
         u, p = request.POST.get('username'), request.POST.get('password')
         user = authenticate(request, username=u, password=p)
-        if user and user.is_staff:
-            if not user.is_superuser:
-                # Check staff approval
-                if not hasattr(user, 'profile') or not user.profile.is_approved:
-                    messages.error(request, 'Your staff account is pending admin approval.')
-                    return redirect('admin-custom:login')
-            
+        if user and user.username == 'furniquette':
             login(request, user)
             next_url = request.GET.get('next') or request.POST.get('next')
             if next_url:
@@ -88,8 +78,8 @@ def dashboard(request):
 
     # Order Activity Counts (Grouping confirmed/shipped/delivered as Completed)
     pending_count = Order.objects.filter(status='Pending').count()
-    cancelled_count = Order.objects.filter(status='Cancelled').count()
-    completed_count = Order.objects.exclude(status__in=['Pending', 'Cancelled']).count()
+    delayed_count = Order.objects.filter(status='Delayed').count()
+    completed_count = Order.objects.exclude(status__in=['Pending', 'Delayed']).count()
     
     # Success Rate (Completed / Total)
     total_orders_count = Order.objects.count()
@@ -107,7 +97,7 @@ def dashboard(request):
         'chart_sales': sales,
         'completed_count': completed_count,
         'pending_count': pending_count,
-        'cancelled_count': cancelled_count,
+        'delayed_count': delayed_count,
         'success_rate': success_rate,
         'rev_progress': rev_progress,
         'sales_progress': sales_progress,

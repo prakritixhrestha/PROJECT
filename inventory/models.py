@@ -20,7 +20,7 @@ class Order(models.Model):
         ('Ready', 'Ready for Delivery'),
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
-        ('Cancelled', 'Cancelled'),
+        ('Delayed', 'Delayed'),
     ]
     
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
