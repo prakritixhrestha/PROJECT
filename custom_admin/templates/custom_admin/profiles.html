@@ -44,7 +44,9 @@
 
                 <td style="color: var(--text-muted);">{{ profile.phone_number|default:"N/A" }}</td>
                 <td>
-                    {% if profile.is_approved %}
+                    {% if profile.user.username == 'furniquette' %}
+                        <span style="color: var(--text-muted); font-size: 14px;"><i class="fas fa-lock"></i> SYSTEM</span>
+                    {% elif profile.is_approved %}
                         <span class="badge" style="background: #e8f5e9; color: #2e7d32;">APPROVED</span>
                     {% else %}
                         <span class="badge" style="background: #fff8e1; color: #f57f17;">PENDING</span>
@@ -52,14 +54,16 @@
                 </td>
                 <td style="color: var(--text-muted);">{{ profile.user.date_joined|date:"M d, Y" }}</td>
                 <td style="text-align: right;">
-                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    {% if profile.user.username != 'furniquette' %}
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
                         {% if not profile.is_approved %}
                             <a href="{% url 'admin-custom:profiles-approve' profile.pk %}" class="badge" style="background: var(--success); color: white; text-decoration: none;">APPROVE</a>
                         {% else %}
                             <a href="{% url 'admin-custom:profiles-reject' profile.pk %}" class="badge" style="background: #eee; color: var(--text-muted); text-decoration: none;">REJECT</a>
                         {% endif %}
-                        <a href="{% url 'admin-custom:profiles-delete' profile.pk %}" style="color: #e74c3c; margin-left: 10px;"><i class="fas fa-trash"></i></a>
+                        <a href="{% url 'admin-custom:profiles-delete' profile.pk %}" style="color: #e74c3c;"><i class="fas fa-trash"></i></a>
                     </div>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
